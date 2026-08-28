@@ -1,0 +1,40 @@
+@startuml Платформа мониторинга поголовья MVP — Alternative System Context
+!NEW_C4_STYLE=1
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_LEFT_RIGHT()
+SHOW_PERSON_OUTLINE()
+
+title Платформа мониторинга поголовья MVP — Alternative System Context
+
+Person(farm_operator, "Оператор фермы", "Контролирует операции и реагирует на оповещения")
+
+System(livestock_monitoring_platform, "Платформа мониторинга поголовья MVP", "Центральная система и локальные приложения ферм для мониторинга, управления оборудованием, автономной работы и синхронизации")
+
+note top of livestock_monitoring_platform
+Канонические термины и границы определены в
+[[https://github.com/vs-ya-practicum/01-MSA-AgroTech/blob/master/ubiquitous-language.md Ubiquitous Language]]
+end note
+
+Enterprise_Boundary(existing_agrotech, "Существующие системы «АгроТех»") {
+    System_Ext(erp_system, "ERP-система (1С:Агро)", "Существующая система персонала, аутентификации, авторизации и складских остатков корма")
+    System_Ext(message_broker, "Брокер сообщений", "Существующая центральная шина событий и метрик")
+    System_Ext(data_lake, "Озеро данных", "Существующее хранилище сырых данных мониторинга")
+}
+System_Ext(uwb_rtls_system, "UWB/RTLS-система", "Готовое программно-аппаратное решение для идентификации, позиционирования, анализа движения и подсчёта")
+System_Ext(farm_equipment, "Оборудование и устройства фермы", "Видеокамеры, кормушки, поилки и системы фильтрации воды")
+System_Ext(wan_connectivity, "Интернет и WAN-каналы", "Основной и резервный интернет-каналы фермы")
+System_Ext(external_metrics_consumer_system, "Внешняя система-потребитель метрик", "Получает базовые и пользовательские метрики")
+
+Rel(farm_operator, livestock_monitoring_platform, "Контролирует операции, управляет оборудованием и получает оповещения")
+Rel(erp_system, livestock_monitoring_platform, "Передаёт персонал, аутентификацию, авторизацию и остатки корма")
+Rel(uwb_rtls_system, livestock_monitoring_platform, "Передаёт идентификаторы, положение, результаты анализа движения и подсчёта")
+Rel(farm_equipment, livestock_monitoring_platform, "Передаёт видеопотоки, телеметрию и состояние")
+Rel(livestock_monitoring_platform, farm_equipment, "Передаёт команды управления оборудованием")
+Rel(livestock_monitoring_platform, wan_connectivity, "Синхронизируется через основной или резервный канал; работает локально при их недоступности")
+Rel(livestock_monitoring_platform, message_broker, "Публикует синхронизированные события и метрики")
+Rel(message_broker, data_lake, "Передаёт сырые события и телеметрию для исторического хранения")
+Rel(message_broker, external_metrics_consumer_system, "Доставляет базовые и пользовательские метрики")
+
+@enduml

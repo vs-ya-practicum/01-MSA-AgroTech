@@ -1,0 +1,68 @@
+@startuml Платформа мониторинга поголовья MVP (System Context)
+!NEW_C4_STYLE=1
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+AddSystemTag("ctl", $bgColor="#1F2933", $fontColor="#D9EAF7", $borderColor="#8FB8D8", $legendText="Контур управления")
+AddSystemTag("ots", $bgColor="#6B7280", $fontColor="#FFFFFF", $borderColor="#9CA3AF", $legendText="Готовые локальные решения")
+AddExternalSystemTag("sw", $bgColor="#1168BD", $fontColor="#FFFFFF", $borderColor="#3C7FC0", $legendText="Программные части")
+AddExternalSystemTag("dev", $bgColor="#6B7280", $fontColor="#FFFFFF", $borderColor="#9CA3AF", $legendText="Устройства и инфраструктура")
+AddExternalSystemTag("old", $bgColor="#4B5563", $fontColor="#E5E7EB", $borderColor="#9CA3AF", $legendText="Существующие системы")
+
+LAYOUT_LEFT_RIGHT()
+SHOW_PERSON_OUTLINE()
+
+title Платформа мониторинга поголовья MVP (System Context)
+
+' Вариант 1: независимые локальные системы ферм работают и синхронизируются с центральной системой.
+
+Person(farm_operator, "Оператор фермы", "Операционные решения, управление и локальное реагирование")
+
+System_Boundary(livestock_monitoring_platform, "Платформа мониторинга поголовья MVP") {
+    System(central_monitoring_platform, "Центральная система управления", "Данные, роли, API, синхронизация, команды и операционная аналитика", $tags="ctl")
+    System_Boundary(farm, "Ферма (1..*)") {
+        System_Boundary(farm_local_system, "Локальная система фермы") {
+            System(farm_local_monitoring_platform, "Локальное операционное приложение фермы", "Интерфейс, оповещения, локальная обработка, управление, хранение и синхронизация", $tags="ctl")
+            System(video_analytics_system, "Система видеоаналитики", "Визуальные признаки с локально развёрнутой ML-моделью партнёра; не движение и подсчёт при наличии UWB", $tags="sw")
+            System(local_edge_iot_gateway, "Локальный edge/IoT-шлюз", "Локальная обработка и управление IoT", $tags="ctl")
+            System(uwb_rtls_system, "UWB/RTLS-система", "Готовое локальное решение для позиционирования и анализа движения", $tags="ots")
+        }
+        System_Boundary(farm_equipment, "Оборудование и датчики фермы") {
+            System_Ext(farm_infrastructure, "Локальная инфраструктура фермы", "Сервер, Wi-Fi, генератор, ПК/планшеты и резервный канал", $tags="dev")
+            System_Ext(video_cameras, "Видеокамеры", "Ночная съёмка", $tags="dev")
+            System_Ext(feeders_and_drinkers, "Кормушки и поилки", "Управляемое оборудование", $tags="dev")
+            System_Ext(water_filtration_system, "Система фильтрации воды", "Контролируемое оборудование", $tags="dev")
+        }
+    }
+}
+System_Ext(external_metrics_consumer_system, "Внешняя система-потребитель метрик", "Метрики", $tags="sw")
+System_Ext(wan_connectivity, "Интернет и WAN-каналы", "Основной и резервный каналы", $tags="dev")
+
+System_Boundary(existing_agrotech, "Существующие системы «АгроТех»") {
+    System_Ext(erp_system, "ERP-система (1С:Агро)", "Персонал, доступ, корм", $tags="old")
+}
+
+Rel(farm_operator, central_monitoring_platform, "Мониторинг и управление")
+Rel(farm_operator, farm_local_monitoring_platform, "Локальное реагирование при сбое связи")
+Rel(farm_infrastructure, farm_local_monitoring_platform, "Размещает")
+Rel(farm_infrastructure, video_analytics_system, "Размещает")
+Rel(farm_infrastructure, local_edge_iot_gateway, "Размещает")
+Rel(video_cameras, video_analytics_system, "Передают видеопотоки")
+Rel_Up(uwb_rtls_system, local_edge_iot_gateway, "Идентификаторы, положение, аналитика движения и подсчёт")
+Rel(video_analytics_system, farm_local_monitoring_platform, "События")
+Rel(local_edge_iot_gateway, farm_local_monitoring_platform, "Локальные сигналы и состояние")
+Rel(farm_local_monitoring_platform, local_edge_iot_gateway, "Команды управления")
+Rel(local_edge_iot_gateway, feeders_and_drinkers, "Команды через локальные контроллеры оборудования")
+Rel(feeders_and_drinkers, local_edge_iot_gateway, "Телеметрия, состояние и результаты команд")
+Rel(local_edge_iot_gateway, water_filtration_system, "Команды через локальные контроллеры оборудования")
+Rel(water_filtration_system, local_edge_iot_gateway, "Телеметрия, состояние и результаты команд")
+Rel(farm_local_monitoring_platform, central_monitoring_platform, "Операционные данные и синхронизация")
+Rel(central_monitoring_platform, farm_local_monitoring_platform, "Команды и подтверждения синхронизации")
+Rel(farm_local_monitoring_platform, wan_connectivity, "Управляет подключением через основной и резервный интернет-каналы; переключается при отказе")
+
+Rel(central_monitoring_platform, erp_system, "Персонал, доступ, корм")
+Rel(central_monitoring_platform, external_metrics_consumer_system, "Метрики")
+
+SHOW_LEGEND()
+
+@enduml

@@ -8,9 +8,10 @@ SHOW_PERSON_OUTLINE()
 
 title Платформа мониторинга поголовья MVP — Alternative System Context
 
-Person(farm_operator, "Оператор фермы", "Контролирует операции и реагирует на оповещения")
+Person(central_management_operator, "Оператор центрального управления", "Анализирует события в Центральной системе управления фермами")
+Person(farm_duty_employee, "Дежурный сотрудник фермы", "Находится на ферме и реагирует на локальные уведомления")
 
-System(livestock_monitoring_platform, "Платформа мониторинга поголовья MVP", "Центральная система и локальные приложения ферм для мониторинга, управления оборудованием, автономной работы и синхронизации")
+System(livestock_monitoring_platform, "Платформа мониторинга поголовья MVP", "Объединяет Центральную систему управления фермами и Локальные операционные приложения ферм для мониторинга, управления оборудованием, автономной работы и синхронизации")
 
 note top of livestock_monitoring_platform
 Канонические термины и границы определены в
@@ -27,7 +28,9 @@ System_Ext(farm_equipment, "Оборудование и устройства ф�
 System_Ext(wan_connectivity, "Интернет и WAN-каналы", "Основной и резервный интернет-каналы фермы")
 System_Ext(external_metrics_consumer_system, "Внешняя система-потребитель метрик", "Получает базовые и пользовательские метрики")
 
-Rel(farm_operator, livestock_monitoring_platform, "Контролирует операции, управляет оборудованием и получает оповещения")
+Rel(central_management_operator, livestock_monitoring_platform, "Анализирует события через Центральную систему управления фермами")
+Rel(livestock_monitoring_platform, central_management_operator, "Передаёт центральные уведомления")
+Rel(livestock_monitoring_platform, farm_duty_employee, "Передаёт локальные уведомления независимо от доступности интернета")
 Rel(erp_system, livestock_monitoring_platform, "Передаёт персонал, аутентификацию, авторизацию и остатки корма")
 Rel(uwb_rtls_system, livestock_monitoring_platform, "Передаёт идентификаторы, положение, результаты анализа движения и подсчёта")
 Rel(farm_equipment, livestock_monitoring_platform, "Передаёт видеопотоки, телеметрию и состояние")

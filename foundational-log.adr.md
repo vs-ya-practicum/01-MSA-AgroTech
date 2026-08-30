@@ -229,7 +229,7 @@ Keep the Data Lake outside the local real-time and offline-critical paths. Store
 
 ### Context
 
-The evidence requires every farm to continue operating, controlling equipment, buffering data, and notifying local staff when connectivity to external systems is unavailable. Synchronization with the Central Management System occurs after connectivity is restored.
+The evidence requires every farm to continue operating, controlling equipment, buffering data, and notifying local staff when connectivity to external systems is unavailable. Synchronization with the Central Farm Management System occurs after connectivity is restored.
 
 The existing AgroTech IoT Platform is external to the MVP. The evidence does not establish that it can satisfy the required independent farm-local operational path. Making local operation depend on it would create a shared external dependency as farms are added.
 
@@ -268,7 +268,7 @@ The MVP requires current operational views, synchronized livestock data, and bas
 
 ### Decision
 
-Prefer use the Central Management System’s operational database with simple reporting read models. Keep the Data Warehouse as an optional later integration for historical analysis and reporting.
+Prefer use the Central Farm Management System’s operational database with simple reporting read models. Keep the Data Warehouse as an optional later integration for historical analysis and reporting.
 
 ### Alternatives
 

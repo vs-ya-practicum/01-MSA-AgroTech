@@ -16,10 +16,11 @@ title Платформа мониторинга поголовья MVP — Prima
 
 ' Вариант 1: независимые локальные системы ферм работают и синхронизируются с центральной системой.
 
-Person(farm_operator, "Оператор фермы", "Операционные решения, управление и локальное реагирование")
+Person(central_management_operator, "Оператор центрального управления", "Анализирует события в Центральной системе управления фермами")
+Person(farm_duty_employee, "Дежурный сотрудник фермы", "Находится на ферме и реагирует на локальные уведомления")
 
 System_Boundary(livestock_monitoring_platform, "Платформа мониторинга поголовья MVP") {
-    Container(central_monitoring_platform, "Центральная система управления", "", "Данные, роли, API, синхронизация, команды и операционная аналитика", $tags="ctl")
+    Container(central_monitoring_platform, "Центральная система управления фермами", "", "Данные, роли, API, синхронизация, команды и операционная аналитика", $tags="ctl")
     System_Boundary(farm, "Ферма (1..*)") {
         System_Boundary(farm_local_system, "Локальная система фермы") {
             Container(farm_local_monitoring_platform, "Локальное операционное приложение фермы", "", "Интерфейс, оповещения, локальная обработка, управление, хранение и синхронизация", $tags="ctl")
@@ -42,8 +43,8 @@ System_Boundary(existing_agrotech, "Существующие системы «А
     System_Ext(erp_system, "ERP-система (1С:Агро)", "Персонал, доступ, корм", $tags="old")
 }
 
-Rel(farm_operator, central_monitoring_platform, "Мониторинг и управление")
-Rel(farm_operator, farm_local_monitoring_platform, "Локальное реагирование при сбое связи")
+Rel(central_management_operator, central_monitoring_platform, "Анализирует события")
+Rel(farm_duty_employee, farm_local_monitoring_platform, "Получает локальные уведомления и реагирует")
 Rel(farm_infrastructure, farm_local_monitoring_platform, "Размещает")
 Rel(farm_infrastructure, video_analytics_system, "Размещает")
 Rel(farm_infrastructure, local_edge_iot_gateway, "Размещает")

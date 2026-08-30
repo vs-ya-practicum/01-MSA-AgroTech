@@ -9,7 +9,6 @@ AddContainerTag("sw", $bgColor="#1168BD", $fontColor="#FFFFFF", $borderColor="#3
 AddExternalSystemTag("dev", $bgColor="#6B7280", $fontColor="#FFFFFF", $borderColor="#9CA3AF", $legendText="Устройства и инфраструктура")
 AddExternalSystemTag("old", $bgColor="#4B5563", $fontColor="#E5E7EB", $borderColor="#9CA3AF", $legendText="Существующие системы")
 
-LAYOUT_LEFT_RIGHT()
 SHOW_PERSON_OUTLINE()
 
 title Платформа мониторинга поголовья MVP — Alternative Container
@@ -21,51 +20,68 @@ Person(central_management_operator, "Оператор центрального �
 Person(farm_duty_employee, "Дежурный сотрудник фермы", "Получает локальные уведомления и управляет оборудованием")
 
 System_Boundary(livestock_monitoring_platform, "Платформа мониторинга поголовья MVP") {
-    Container(central_monitoring_platform, "Центральная система управления фермами", "Web API", "Данные, роли, API, синхронизация, команды и операционная аналитика", $tags="ctl")
-    ContainerDb(central_operational_data_store, "Центральное операционное хранилище данных", "Реляционная БД", "Синхронизированные операционные данные", $tags="ctl")
+    Container(central_monitoring_platform, "Центральная система управления фермами", "", "Операции, API и синхронизация", $tags="ctl")
+    ContainerDb(central_operational_data_store, "Центральное операционное хранилище данных", "", "Синхронизированные операционные данные", $tags="ctl")
+    Container(central_mqtt_broker, "Центральный MQTT-брокер", "MQTT over TLS, QoS 1", "Синхронизация ферм, команды и подтверждения", $tags="sw")
 
     System_Boundary(farm, "Ферма (1..*)") {
         System_Boundary(farm_local_system, "Локальная система фермы") {
-            Container(farm_local_monitoring_platform, "Локальное операционное приложение фермы", "Локальное приложение", "Интерфейс, Локальные уведомления, управление, синхронизация", $tags="ctl")
-            ContainerDb(local_operational_data_store, "Локальное операционное хранилище данных", "Локальная БД", "Операционные данные и outbox Исходящих уведомлений", $tags="ctl")
-            Container(video_analytics_system, "Система видеоаналитики", "Локальная ML-модель партнёра", "Визуальные признаки и события", $tags="sw")
-            Container(local_edge_iot_gateway, "Локальный edge/IoT-шлюз", "Edge gateway", "Интеграция устройств, телеметрия и управление", $tags="ctl")
-            Container(uwb_rtls_system, "UWB/RTLS-система", "Готовое локальное решение", "Идентификация, положение, движение и подсчёт", $tags="ots")
+            Container(farm_local_monitoring_platform, "Локальное операционное приложение фермы", "", "Интерфейс, оповещения, управление и синхронизация", $tags="ctl")
+            ContainerDb(local_operational_data_store, "Локальное операционное хранилище данных", "", "Операционные данные и outbox", $tags="ctl")
+            Container(video_analytics_system, "Система видеоаналитики", "", "Локальная ML-модель; визуальные признаки", $tags="sw")
+            Container(local_edge_iot_gateway, "Локальный edge/IoT-шлюз", "", "Интеграция устройств и управление", $tags="ctl")
+            Container(local_mqtt_broker, "Локальный MQTT-брокер", "MQTT, QoS 1", "Локальная шина событий и команд", $tags="sw")
+            Container(uwb_rtls_system, "UWB/RTLS-система", "", "Положение, движение и подсчёт", $tags="ots")
         }
-        System_Ext(video_cameras, "Видеокамеры", "Ночная съёмка", $tags="dev")
-        System_Ext(uwb_tags_and_anchors, "UWB-метки и якоря/приёмники", "Источник идентификаторов и координат", $tags="dev")
-        System_Ext(farm_equipment, "Оборудование фермы", "Кормушки, поилки и система фильтрации воды", $tags="dev")
+        System_Boundary(farm_equipment, "Оборудование и датчики фермы") {
+            System_Ext(farm_infrastructure, "Локальная инфраструктура фермы", "Сервер, Wi-Fi, генератор, ПК/планшеты и резервный канал", $tags="dev")
+            System_Ext(video_cameras, "Видеокамеры", "Ночная съёмка", $tags="dev")
+            System_Ext(uwb_tags_and_anchors, "UWB-метки и якоря/приёмники", "Источник идентификаторов и координат поголовья", $tags="dev")
+            System_Ext(feeders_and_drinkers, "Кормушки и поилки", "Управляемое оборудование", $tags="dev")
+            System_Ext(water_filtration_system, "Система фильтрации воды", "Контролируемое оборудование", $tags="dev")
+        }
     }
 }
 
 Enterprise_Boundary(existing_agrotech, "Существующие системы «АгроТех»") {
     System_Ext(erp_system, "ERP-система 1С:Агро", "Персонал, аутентификация, авторизация и остатки корма", $tags="old")
-    System_Ext(message_broker, "Брокер сообщений", "RabbitMQ; центральная шина событий и метрик", $tags="old")
-    System_Ext(data_lake, "Озеро данных", "S3-совместимое хранилище сырых данных", $tags="old")
+    System_Ext(message_broker, "Брокер сообщений", "RabbitMQ; центральная шина событий", $tags="old")
+    System_Ext(data_lake, "Озеро данных", "S3-хранилище данных мониторинга", $tags="old")
 }
-System_Ext(external_metrics_consumer_system, "Внешняя система-потребитель метрик", "Получает базовые и пользовательские метрики", $tags="sw")
+System_Ext(external_metrics_consumer_system, "Внешняя система-потребитель метрик", "Метрики", $tags="sw")
+System_Ext(wan_connectivity, "Внешняя связь фермы", "Основной и резервный каналы", $tags="dev")
 
-Rel(central_management_operator, central_monitoring_platform, "Анализирует события и планирует операции", "HTTPS")
-Rel(farm_duty_employee, farm_local_monitoring_platform, "Получает Локальные уведомления и управляет оборудованием", "Локальный интерфейс")
-Rel(central_monitoring_platform, central_operational_data_store, "Сохраняет синхронизированные данные", "SQL")
-Rel(farm_local_monitoring_platform, local_operational_data_store, "Сохраняет данные и outbox", "SQL")
+Rel(central_management_operator, central_monitoring_platform, "Анализирует события, организует пополнение корма и планирует операции")
+Rel(farm_duty_employee, farm_local_monitoring_platform, "Получает локальные уведомления, проверяет условия, оценивает вмешательство, координирует ремонт и управляет оборудованием")
+Rel(central_monitoring_platform, central_operational_data_store, "Сохраняет и восстанавливает синхронизированные операционные данные")
+Rel(farm_local_monitoring_platform, local_operational_data_store, "Сохраняет и восстанавливает локальные операционные данные и Исходящие уведомления")
+Rel(farm_infrastructure, farm_local_monitoring_platform, "Размещает")
+Rel(farm_infrastructure, video_analytics_system, "Размещает")
+Rel(farm_infrastructure, local_edge_iot_gateway, "Размещает")
 Rel(video_cameras, video_analytics_system, "Передают видеопотоки", "RTSP, локальная сеть")
 Rel(uwb_tags_and_anchors, uwb_rtls_system, "Передают идентификаторы и координаты", "UWB")
-Rel(video_analytics_system, farm_local_monitoring_platform, "Передаёт визуальные события для Локального уведомления ≤5 секунд", "Локальная сеть")
-Rel(uwb_rtls_system, local_edge_iot_gateway, "Передаёт положение, движение и подсчёт", "Локальный API производителя")
-Rel(local_edge_iot_gateway, farm_local_monitoring_platform, "Передаёт нормализованную телеметрию", "MQTT или API производителя")
-Rel(farm_local_monitoring_platform, local_edge_iot_gateway, "Передаёт команды управления", "Локальный API")
-Rel(local_edge_iot_gateway, farm_equipment, "Передаёт команды и получает телеметрию", "Промышленный протокол производителя")
-Rel(farm_local_monitoring_platform, central_monitoring_platform, "Синхронизирует данные из outbox до подтверждения доставки", "HTTPS/JSON, идемпотентно")
-Rel(central_monitoring_platform, farm_local_monitoring_platform, "Передаёт команды и подтверждения", "HTTPS/JSON")
-Rel(central_monitoring_platform, erp_system, "Запрашивает персонал, доступ и остатки корма", "REST/HTTPS, только чтение")
-Rel(central_monitoring_platform, message_broker, "Публикует синхронизированные события и метрики", "AMQP")
-Rel(message_broker, external_metrics_consumer_system, "Доставляет метрики", "AMQP")
-Rel(message_broker, data_lake, "Передаёт сырые события и телеметрию", "AMQP; S3 API")
+Rel_Up(uwb_rtls_system, local_edge_iot_gateway, "Идентификаторы, положение, аналитика движения и подсчёт", "Локальный API производителя")
+Rel(video_analytics_system, local_mqtt_broker, "Визуальные события ≤5 сек", "MQTT, QoS 1")
+Rel(local_edge_iot_gateway, local_mqtt_broker, "Нормализованные сигналы, состояние и результаты", "MQTT, QoS 1")
+Rel(local_mqtt_broker, farm_local_monitoring_platform, "События и состояние", "MQTT, QoS 1")
+Rel(farm_local_monitoring_platform, local_mqtt_broker, "Запросы управления (correlation ID)", "MQTT, QoS 1")
+Rel(local_mqtt_broker, local_edge_iot_gateway, "Запросы управления", "MQTT, QoS 1")
+Rel(local_edge_iot_gateway, feeders_and_drinkers, "Передаёт команды через локальные контроллеры оборудования", "Промышленный протокол производителя")
+Rel(feeders_and_drinkers, local_edge_iot_gateway, "Передают телеметрию, состояние и результаты команд", "Промышленный протокол производителя")
+Rel(local_edge_iot_gateway, water_filtration_system, "Передаёт команды через локальные контроллеры оборудования", "Промышленный протокол производителя")
+Rel(water_filtration_system, local_edge_iot_gateway, "Передаёт телеметрию, состояние и результаты команд", "Промышленный протокол производителя")
+Rel(farm_local_monitoring_platform, central_mqtt_broker, "Накопленные операционные данные", "MQTT over TLS, QoS 1")
+Rel(central_mqtt_broker, central_monitoring_platform, "Операционные данные", "MQTT, QoS 1")
+Rel(central_monitoring_platform, central_mqtt_broker, "Команды и подтверждения", "MQTT, QoS 1")
+Rel(central_mqtt_broker, farm_local_monitoring_platform, "Команды и подтверждения", "MQTT over TLS, QoS 1")
+Rel(farm_local_monitoring_platform, wan_connectivity, "Основной/резервный WAN; failover")
+Rel(central_monitoring_platform, erp_system, "Запрашивает персонал, аутентификацию, авторизацию и остатки корма", "REST/HTTPS, только чтение")
+Rel(central_monitoring_platform, message_broker, "События и метрики", "AMQP")
+Rel(message_broker, external_metrics_consumer_system, "Метрики", "AMQP")
+Rel(message_broker, data_lake, "Данные мониторинга", "AMQP; S3 API")
 
 note bottom of farm_local_monitoring_platform
-Локальные оповещения и управление оборудованием
-не зависят от Брокера сообщений, Озера данных или WAN.
+Локальный путь не зависит от WAN, Брокера сообщений и Озера данных.
 end note
 
 SHOW_LEGEND()

@@ -9,7 +9,6 @@ AddContainerTag("sw", $bgColor="#1168BD", $fontColor="#FFFFFF", $borderColor="#3
 AddExternalSystemTag("dev", $bgColor="#6B7280", $fontColor="#FFFFFF", $borderColor="#9CA3AF", $legendText="Устройства и инфраструктура")
 AddExternalSystemTag("old", $bgColor="#4B5563", $fontColor="#E5E7EB", $borderColor="#9CA3AF", $legendText="Существующие системы")
 
-LAYOUT_LEFT_RIGHT()
 SHOW_PERSON_OUTLINE()
 
 title Платформа мониторинга поголовья MVP — Primary Container
@@ -22,12 +21,14 @@ Person(farm_duty_employee, "Дежурный сотрудник фермы", "П
 System_Boundary(livestock_monitoring_platform, "Платформа мониторинга поголовья MVP") {
     Container(central_monitoring_platform, "Центральная система управления фермами", "", "Данные, роли, API, синхронизация, команды и операционная аналитика", $tags="ctl")
     ContainerDb(central_operational_data_store, "Центральное операционное хранилище данных", "", "Синхронизированные операционные данные; резервное копирование и восстановление", $tags="ctl")
+    Container(central_mqtt_broker, "Центральный MQTT-брокер", "MQTT over TLS, QoS 1", "Синхронизация ферм, команды и подтверждения", $tags="sw")
     System_Boundary(farm, "Ферма (1..*)") {
         System_Boundary(farm_local_system, "Локальная система фермы") {
             Container(farm_local_monitoring_platform, "Локальное операционное приложение фермы", "", "Интерфейс, оповещения, локальная обработка, управление, хранение и синхронизация", $tags="ctl")
             ContainerDb(local_operational_data_store, "Локальное операционное хранилище данных", "", "Локальные операционные данные и outbox Исходящих уведомлений; локальное восстановление и повторная синхронизация", $tags="ctl")
             Container(video_analytics_system, "Система видеоаналитики", "", "Визуальные признаки с локально развёрнутой ML-моделью партнёра; не движение и подсчёт при наличии UWB", $tags="sw")
             Container(local_edge_iot_gateway, "Локальный edge/IoT-шлюз", "", "Локальная обработка и управление IoT", $tags="ctl")
+            Container(local_mqtt_broker, "Локальный MQTT-брокер", "MQTT, QoS 1", "Локальная шина событий и команд", $tags="sw")
             Container(uwb_rtls_system, "UWB/RTLS-система", "", "Готовое локальное решение для позиционирования и анализа движения", $tags="ots")
         }
         System_Boundary(farm_equipment, "Оборудование и датчики фермы") {
@@ -56,16 +57,20 @@ Rel(farm_infrastructure, local_edge_iot_gateway, "Размещает")
 Rel(video_cameras, video_analytics_system, "Передают видеопотоки", "RTSP, локальная сеть")
 Rel(uwb_tags_and_anchors, uwb_rtls_system, "Передают идентификаторы и координаты", "UWB")
 Rel_Up(uwb_rtls_system, local_edge_iot_gateway, "Идентификаторы, положение, аналитика движения и подсчёт", "Локальный API производителя")
-Rel(video_analytics_system, farm_local_monitoring_platform, "Передаёт визуальные события для Локального уведомления ≤5 секунд", "HTTPS/JSON, локальный callback")
-Rel(local_edge_iot_gateway, farm_local_monitoring_platform, "Передаёт нормализованные локальные сигналы и состояние", "HTTPS/JSON, event ID, подтверждение и повтор")
-Rel(farm_local_monitoring_platform, local_edge_iot_gateway, "Передаёт команды управления", "HTTPS/JSON, локальный command API")
+Rel(video_analytics_system, local_mqtt_broker, "Визуальные события ≤5 сек", "MQTT, QoS 1")
+Rel(local_edge_iot_gateway, local_mqtt_broker, "Нормализованные сигналы, состояние и результаты", "MQTT, QoS 1")
+Rel(local_mqtt_broker, farm_local_monitoring_platform, "События и состояние", "MQTT, QoS 1")
+Rel(farm_local_monitoring_platform, local_mqtt_broker, "Запросы управления (correlation ID)", "MQTT, QoS 1")
+Rel(local_mqtt_broker, local_edge_iot_gateway, "Запросы управления", "MQTT, QoS 1")
 Rel(local_edge_iot_gateway, feeders_and_drinkers, "Передаёт команды через локальные контроллеры оборудования", "Промышленный протокол производителя")
 Rel(feeders_and_drinkers, local_edge_iot_gateway, "Передают телеметрию, состояние и результаты команд", "Промышленный протокол производителя")
 Rel(local_edge_iot_gateway, water_filtration_system, "Передаёт команды через локальные контроллеры оборудования", "Промышленный протокол производителя")
 Rel(water_filtration_system, local_edge_iot_gateway, "Передаёт телеметрию, состояние и результаты команд", "Промышленный протокол производителя")
-Rel(farm_local_monitoring_platform, central_monitoring_platform, "Синхронизирует операционные данные из outbox до подтверждения доставки", "HTTPS/JSON, идемпотентно")
-Rel(central_monitoring_platform, farm_local_monitoring_platform, "Передаёт команды и подтверждения синхронизации", "HTTPS/JSON")
-Rel(farm_local_monitoring_platform, wan_connectivity, "Управляет подключением через основной и резервный интернет-каналы; переключается при отказе")
+Rel(farm_local_monitoring_platform, central_mqtt_broker, "Накопленные операционные данные", "MQTT over TLS, QoS 1")
+Rel(central_mqtt_broker, central_monitoring_platform, "Операционные данные", "MQTT, QoS 1")
+Rel(central_monitoring_platform, central_mqtt_broker, "Команды и подтверждения", "MQTT, QoS 1")
+Rel(central_mqtt_broker, farm_local_monitoring_platform, "Команды и подтверждения", "MQTT over TLS, QoS 1")
+Rel(farm_local_monitoring_platform, wan_connectivity, "Основной/резервный WAN; failover")
 
 Rel(central_monitoring_platform, erp_system, "Запрашивает персонал, аутентификацию, авторизацию и остатки корма", "REST/HTTPS, только чтение")
 Rel(central_monitoring_platform, external_metrics_consumer_system, "Экспортирует базовые и пользовательские метрики", "HTTPS/JSON")

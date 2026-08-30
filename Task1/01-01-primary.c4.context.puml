@@ -19,7 +19,6 @@ note top of livestock_monitoring_platform
 end note
 
 System_Ext(erp_system, "ERP-система 1С:Агро", "Существующая система персонала, аутентификации, авторизации и складских остатков корма")
-System(uwb_rtls_system, "UWB/RTLS-система", "Готовое программно-аппаратное решение, локально установленное в Локальной системе фермы MVP, для идентификации, позиционирования, анализа движения и подсчёта")
 System_Ext(farm_equipment, "Оборудование и устройства фермы", "Видеокамеры, кормушки, поилки и системы фильтрации воды")
 System_Ext(wan_connectivity, "Внешняя связь фермы", "Внешняя связь для синхронизации с центральными и другими внешними системами")
 System_Ext(external_metrics_consumer_system, "Внешняя система-потребитель метрик", "Получает базовые и пользовательские метрики")
@@ -28,7 +27,6 @@ Rel(central_management_operator, livestock_monitoring_platform, "Анализи�
 Rel(livestock_monitoring_platform, central_management_operator, "Передаёт центральные уведомления")
 Rel(livestock_monitoring_platform, farm_duty_employee, "Передаёт локальные уведомления независимо от доступности интернета")
 Rel(erp_system, livestock_monitoring_platform, "Передаёт персонал, аутентификацию, авторизацию и остатки корма")
-Rel(uwb_rtls_system, livestock_monitoring_platform, "Передаёт идентификаторы, положение, результаты анализа движения и подсчёта")
 Rel(farm_equipment, livestock_monitoring_platform, "Передаёт видеопотоки, телеметрию и состояние")
 Rel(livestock_monitoring_platform, farm_equipment, "Передаёт команды управления оборудованием")
 Rel(livestock_monitoring_platform, wan_connectivity, "Синхронизируется через Внешнюю связь фермы; работает локально при её недоступности")

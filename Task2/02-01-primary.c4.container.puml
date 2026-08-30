@@ -1,31 +1,31 @@
-@startuml Платформа мониторинга поголовья MVP (System Context)
+@startuml Платформа мониторинга поголовья MVP — Primary Container
 !NEW_C4_STYLE=1
 
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
-AddSystemTag("ctl", $bgColor="#1F2933", $fontColor="#D9EAF7", $borderColor="#8FB8D8", $legendText="Контур управления")
-AddSystemTag("ots", $bgColor="#6B7280", $fontColor="#FFFFFF", $borderColor="#9CA3AF", $legendText="Готовые локальные решения")
-AddExternalSystemTag("sw", $bgColor="#1168BD", $fontColor="#FFFFFF", $borderColor="#3C7FC0", $legendText="Программные части")
+AddContainerTag("ctl", $bgColor="#1F2933", $fontColor="#D9EAF7", $borderColor="#8FB8D8", $legendText="Контур управления")
+AddExternalSystemTag("ots", $bgColor="#6B7280", $fontColor="#FFFFFF", $borderColor="#9CA3AF", $legendText="Готовые локальные решения")
+AddContainerTag("sw", $bgColor="#1168BD", $fontColor="#FFFFFF", $borderColor="#3C7FC0", $legendText="Программные части")
 AddExternalSystemTag("dev", $bgColor="#6B7280", $fontColor="#FFFFFF", $borderColor="#9CA3AF", $legendText="Устройства и инфраструктура")
 AddExternalSystemTag("old", $bgColor="#4B5563", $fontColor="#E5E7EB", $borderColor="#9CA3AF", $legendText="Существующие системы")
 
 LAYOUT_LEFT_RIGHT()
 SHOW_PERSON_OUTLINE()
 
-title Платформа мониторинга поголовья MVP (System Context)
+title Платформа мониторинга поголовья MVP — Primary Container
 
 ' Вариант 1: независимые локальные системы ферм работают и синхронизируются с центральной системой.
 
 Person(farm_operator, "Оператор фермы", "Операционные решения, управление и локальное реагирование")
 
 System_Boundary(livestock_monitoring_platform, "Платформа мониторинга поголовья MVP") {
-    System(central_monitoring_platform, "Центральная система управления", "Данные, роли, API, синхронизация, команды и операционная аналитика", $tags="ctl")
+    Container(central_monitoring_platform, "Центральная система управления", "", "Данные, роли, API, синхронизация, команды и операционная аналитика", $tags="ctl")
     System_Boundary(farm, "Ферма (1..*)") {
         System_Boundary(farm_local_system, "Локальная система фермы") {
-            System(farm_local_monitoring_platform, "Локальное операционное приложение фермы", "Интерфейс, оповещения, локальная обработка, управление, хранение и синхронизация", $tags="ctl")
-            System(video_analytics_system, "Система видеоаналитики", "Визуальные признаки с локально развёрнутой ML-моделью партнёра; не движение и подсчёт при наличии UWB", $tags="sw")
-            System(local_edge_iot_gateway, "Локальный edge/IoT-шлюз", "Локальная обработка и управление IoT", $tags="ctl")
-            System(uwb_rtls_system, "UWB/RTLS-система", "Готовое локальное решение для позиционирования и анализа движения", $tags="ots")
+            Container(farm_local_monitoring_platform, "Локальное операционное приложение фермы", "", "Интерфейс, оповещения, локальная обработка, управление, хранение и синхронизация", $tags="ctl")
+            Container(video_analytics_system, "Система видеоаналитики", "", "Визуальные признаки с локально развёрнутой ML-моделью партнёра; не движение и подсчёт при наличии UWB", $tags="sw")
+            Container(local_edge_iot_gateway, "Локальный edge/IoT-шлюз", "", "Локальная обработка и управление IoT", $tags="ctl")
+            System_Ext(uwb_rtls_system, "UWB/RTLS-система", "Готовое локальное решение для позиционирования и анализа движения", $tags="ots")
         }
         System_Boundary(farm_equipment, "Оборудование и датчики фермы") {
             System_Ext(farm_infrastructure, "Локальная инфраструктура фермы", "Сервер, Wi-Fi, генератор, ПК/планшеты и резервный канал", $tags="dev")

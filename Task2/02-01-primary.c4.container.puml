@@ -28,7 +28,7 @@ System_Boundary(livestock_monitoring_platform, "Платформа монито�
             ContainerDb(local_operational_data_store, "Локальное операционное хранилище данных", "", "Локальные операционные данные и Исходящие уведомления; локальное восстановление", $tags="ctl")
             Container(video_analytics_system, "Система видеоаналитики", "", "Визуальные признаки с локально развёрнутой ML-моделью партнёра; не движение и подсчёт при наличии UWB", $tags="sw")
             Container(local_edge_iot_gateway, "Локальный edge/IoT-шлюз", "", "Локальная обработка и управление IoT", $tags="ctl")
-            System_Ext(uwb_rtls_system, "UWB/RTLS-система", "Готовое локальное решение для позиционирования и анализа движения", $tags="ots")
+            Container(uwb_rtls_system, "UWB/RTLS-система", "", "Готовое локальное решение для позиционирования и анализа движения", $tags="ots")
         }
         System_Boundary(farm_equipment, "Оборудование и датчики фермы") {
             System_Ext(farm_infrastructure, "Локальная инфраструктура фермы", "Сервер, Wi-Fi, генератор, ПК/планшеты и резервный канал", $tags="dev")

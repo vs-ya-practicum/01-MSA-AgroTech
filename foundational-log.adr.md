@@ -208,7 +208,7 @@ The MVP requires local operation, offline work, real-time alerts, and synchroniz
 
 ### Decision
 
-Prefer reusing the existing Data Lake for synchronized raw events, telemetry, and historical livestock-monitoring data, subject to validation of access, isolation, retention, and integration requirements. Require the selected central data store to provide backup and recovery for synchronized operational data.
+Defer reuse of the existing Data Lake for the MVP. Treat it as an optional later integration for synchronized raw events, telemetry, and historical livestock-monitoring data, subject to validation of access, isolation, retention, backup, and integration requirements.
 
 ### Alternatives
 
@@ -217,7 +217,7 @@ Prefer reusing the existing Data Lake for synchronized raw events, telemetry, an
 
 ### Consequences
 
-Keep the Data Lake outside the local real-time and offline-critical paths. Store data locally first when disconnected, then synchronize it to the preferred or selected Data Lake after connectivity is restored.
+Keep the Data Lake outside the local real-time and offline-critical paths. Each farm retains and recovers farm-local operational data in its Local Operational Data Store while disconnected, then synchronizes the required operational data with the Central Farm Management System after connectivity is restored. Reconsider Data Lake integration when historical storage or analytics becomes required.
 
 ---
 
@@ -237,7 +237,7 @@ The existing AgroTech IoT Platform is external to the MVP. The evidence does not
 
 Do not reuse the existing external IoT Platform on the farm-local operational path.
 
-Implement farm-local device integration, telemetry collection, equipment control, local buffering, local notifications, and synchronization through the Local Edge/IoT Gateway and Farm Local Operations Application. The Local Operational Data Store provides local recovery of farm operational data. Each farm operates independently when connectivity to external systems is unavailable.
+Implement farm-local device integration, telemetry collection, equipment control, and bounded raw-signal buffering through the Local Edge/IoT Gateway. Implement local notifications, durable local operational storage, and synchronization through the Farm Local Operations Application. The Local Operational Data Store provides local recovery of farm operational data. Each farm operates independently when connectivity to external systems is unavailable.
 
 The existing IoT Platform may be considered later only as a consumer of synchronized, non-critical data through a separately recorded central integration decision.
 
@@ -250,7 +250,7 @@ The existing IoT Platform may be considered later only as a consumer of synchron
 
 Each farm has an independent Farm Local System that continues operating when connectivity to external systems is unavailable. Add a farm by deploying and configuring its local systems, without adding a dependency on the existing external IoT Platform.
 
-Keep external systems outside the local device-control, local-notification, UWB/RTLS, and real-time video-alert paths. The Local Edge/IoT Gateway owns local device integration, telemetry normalization, equipment control, buffering, and synchronization.
+Keep external systems outside the local device-control, local-notification, UWB/RTLS, and real-time video-alert paths. The Local Edge/IoT Gateway owns local device integration, telemetry normalization, equipment control, and bounded raw-signal buffering. The Farm Local Operations Application owns local notifications, durable local operational storage, and synchronization with the Central Farm Management System.
 
 ---
 

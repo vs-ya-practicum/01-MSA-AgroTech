@@ -18,6 +18,13 @@ Container_Boundary(farm_local_operations_application, "Локальное опе
     Component(mqtt_adapter, "MQTT-адаптер", "MQTT client", "Получает события и состояние; публикует запросы управления")
 }
 
+Container_Boundary(local_edge_iot_gateway, "Локальный edge/IoT-шлюз") {
+    Component(device_protocol_adapters, "Адаптеры устройств", "Application component", "Обмениваются телеметрией, состоянием и командами с контроллерами оборудования")
+    Component(uwb_rtls_adapter, "Адаптер UWB/RTLS", "Application component", "Получает идентификаторы, положение, движение и подсчёт через API производителя")
+    Component(edge_control_and_normalization, "Модуль нормализации и управления", "Application component", "Нормализует данные, маршрутизирует команды и результаты их выполнения")
+    ComponentDb(edge_raw_signal_buffer, "Буфер необработанных сигналов edge-шлюза", "Temporary local store", "Ограниченно хранит сигналы и результаты команд до подтверждённой передачи")
+}
+
 Container_Boundary(central_farm_management_system, "Центральная система управления фермами") {
     Component(central_mqtt_message_handler, "Обработчик сообщений MQTT", "Application component", "Принимает операционные данные; публикует команды и подтверждения")
     Component(central_operations_management, "Модуль центрального управления операциями", "Application component", "Управляет фермами, ролями, командами и операционной аналитикой")
@@ -28,17 +35,30 @@ Container_Boundary(central_farm_management_system, "Центральная си�
 ContainerDb(local_operational_data_store, "Локальное операционное хранилище данных", "", "Операционные данные, состояния, Исходящие уведомления и outbox")
 ContainerDb(central_operational_data_store, "Центральное операционное хранилище данных", "", "Синхронизированные операционные данные")
 Container_Ext(local_mqtt_broker, "Локальный MQTT-брокер", "MQTT, QoS 1", "Локальная шина событий и команд")
+Container_Ext(video_analytics_system, "Система видеоаналитики", "", "Локальная ML-модель партнёра; публикует визуальные события")
 Container_Ext(central_mqtt_broker, "Центральный MQTT-брокер", "MQTT over TLS, QoS 1", "Синхронизация ферм, команды и подтверждения")
 Container_Ext(wan_connectivity, "Внешняя связь фермы", "Основной и резервный каналы")
+System_Ext(uwb_rtls_system, "UWB/RTLS-система", "Готовое локальное решение для позиционирования, движения и подсчёта")
+System_Ext(farm_equipment, "Кормушки, поилки и система фильтрации воды", "Управляемое оборудование")
 System_Ext(erp_system, "ERP-система 1С:Агро", "Персонал, доступ, корм")
 System_Ext(external_metrics_consumer_system, "Внешняя система-потребитель метрик", "Метрики")
 
 Rel(central_management_operator, central_operations_management, "Анализирует события, организует пополнение корма и планирует операции")
 Rel(farm_duty_employee, local_processing_and_control, "Получает Локальные уведомления и запрашивает управление")
+Rel(video_analytics_system, local_mqtt_broker, "Визуальные события ≤5 сек", "MQTT, QoS 1")
 Rel(local_mqtt_broker, mqtt_adapter, "События и состояние", "MQTT, QoS 1")
 Rel(mqtt_adapter, local_mqtt_broker, "Запросы управления", "MQTT, QoS 1")
 Rel(mqtt_adapter, local_processing_and_control, "Передаёт события, состояние и результаты команд")
 Rel(local_processing_and_control, mqtt_adapter, "Передаёт запросы управления")
+Rel(uwb_rtls_system, uwb_rtls_adapter, "Передаёт результаты позиционирования, движения и подсчёта", "Локальный API производителя")
+Rel(uwb_rtls_adapter, edge_control_and_normalization, "Передаёт нормализованные результаты UWB/RTLS")
+Rel(farm_equipment, device_protocol_adapters, "Передают телеметрию, состояние и результаты команд", "Промышленный протокол производителя")
+Rel(device_protocol_adapters, farm_equipment, "Передают команды управления", "Промышленный протокол производителя")
+Rel(device_protocol_adapters, edge_control_and_normalization, "Передаёт нормализованные сигналы и результаты команд")
+Rel(edge_control_and_normalization, device_protocol_adapters, "Передаёт запросы управления")
+Rel(edge_control_and_normalization, edge_raw_signal_buffer, "Сохраняет и удаляет после подтверждённой передачи")
+Rel(edge_control_and_normalization, local_mqtt_broker, "Нормализованные сигналы, состояние и результаты", "MQTT, QoS 1")
+Rel(local_mqtt_broker, edge_control_and_normalization, "Запросы управления", "MQTT, QoS 1")
 Rel(local_processing_and_control, local_operational_data_store, "Сохраняет операционные данные и Исходящие уведомления")
 Rel(synchronization_module, local_operational_data_store, "Читает outbox и подтверждает доставку")
 Rel(connectivity_management_module, synchronization_module, "Сообщает о доступности WAN")

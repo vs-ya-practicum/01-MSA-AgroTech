@@ -25,7 +25,7 @@ System_Boundary(livestock_monitoring_platform, "Платформа монито�
     System_Boundary(farm, "Ферма (1..*)") {
         System_Boundary(farm_local_system, "Локальная система фермы") {
             Container(farm_local_monitoring_platform, "Локальное операционное приложение фермы", "", "Интерфейс, оповещения, локальная обработка, управление, хранение и синхронизация", $tags="ctl")
-            ContainerDb(local_operational_data_store, "Локальное операционное хранилище данных", "", "Локальные операционные данные и Исходящие уведомления; локальное восстановление", $tags="ctl")
+            ContainerDb(local_operational_data_store, "Локальное операционное хранилище данных", "", "Локальные операционные данные и outbox Исходящих уведомлений; локальное восстановление и повторная синхронизация", $tags="ctl")
             Container(video_analytics_system, "Система видеоаналитики", "", "Визуальные признаки с локально развёрнутой ML-моделью партнёра; не движение и подсчёт при наличии UWB", $tags="sw")
             Container(local_edge_iot_gateway, "Локальный edge/IoT-шлюз", "", "Локальная обработка и управление IoT", $tags="ctl")
             Container(uwb_rtls_system, "UWB/RTLS-система", "", "Готовое локальное решение для позиционирования и анализа движения", $tags="ots")
@@ -33,6 +33,7 @@ System_Boundary(livestock_monitoring_platform, "Платформа монито�
         System_Boundary(farm_equipment, "Оборудование и датчики фермы") {
             System_Ext(farm_infrastructure, "Локальная инфраструктура фермы", "Сервер, Wi-Fi, генератор, ПК/планшеты и резервный канал", $tags="dev")
             System_Ext(video_cameras, "Видеокамеры", "Ночная съёмка", $tags="dev")
+            System_Ext(uwb_tags_and_anchors, "UWB-метки и якоря/приёмники", "Источник идентификаторов и координат поголовья", $tags="dev")
             System_Ext(feeders_and_drinkers, "Кормушки и поилки", "Управляемое оборудование", $tags="dev")
             System_Ext(water_filtration_system, "Система фильтрации воды", "Контролируемое оборудование", $tags="dev")
         }
@@ -52,21 +53,22 @@ Rel(farm_local_monitoring_platform, local_operational_data_store, "Сохран�
 Rel(farm_infrastructure, farm_local_monitoring_platform, "Размещает")
 Rel(farm_infrastructure, video_analytics_system, "Размещает")
 Rel(farm_infrastructure, local_edge_iot_gateway, "Размещает")
-Rel(video_cameras, video_analytics_system, "Передают видеопотоки")
-Rel_Up(uwb_rtls_system, local_edge_iot_gateway, "Идентификаторы, положение, аналитика движения и подсчёт")
-Rel(video_analytics_system, farm_local_monitoring_platform, "События")
-Rel(local_edge_iot_gateway, farm_local_monitoring_platform, "Локальные сигналы и состояние")
-Rel(farm_local_monitoring_platform, local_edge_iot_gateway, "Команды управления")
-Rel(local_edge_iot_gateway, feeders_and_drinkers, "Команды через локальные контроллеры оборудования")
-Rel(feeders_and_drinkers, local_edge_iot_gateway, "Телеметрия, состояние и результаты команд")
-Rel(local_edge_iot_gateway, water_filtration_system, "Команды через локальные контроллеры оборудования")
-Rel(water_filtration_system, local_edge_iot_gateway, "Телеметрия, состояние и результаты команд")
-Rel(farm_local_monitoring_platform, central_monitoring_platform, "Операционные данные и синхронизация")
-Rel(central_monitoring_platform, farm_local_monitoring_platform, "Команды и подтверждения синхронизации")
+Rel(video_cameras, video_analytics_system, "Передают видеопотоки", "RTSP, локальная сеть")
+Rel(uwb_tags_and_anchors, uwb_rtls_system, "Передают идентификаторы и координаты", "UWB")
+Rel_Up(uwb_rtls_system, local_edge_iot_gateway, "Идентификаторы, положение, аналитика движения и подсчёт", "Локальный API производителя")
+Rel(video_analytics_system, farm_local_monitoring_platform, "Передаёт визуальные события для Локального уведомления ≤5 секунд", "HTTPS/JSON, локальный callback")
+Rel(local_edge_iot_gateway, farm_local_monitoring_platform, "Передаёт нормализованные локальные сигналы и состояние", "HTTPS/JSON, event ID, подтверждение и повтор")
+Rel(farm_local_monitoring_platform, local_edge_iot_gateway, "Передаёт команды управления", "HTTPS/JSON, локальный command API")
+Rel(local_edge_iot_gateway, feeders_and_drinkers, "Передаёт команды через локальные контроллеры оборудования", "Промышленный протокол производителя")
+Rel(feeders_and_drinkers, local_edge_iot_gateway, "Передают телеметрию, состояние и результаты команд", "Промышленный протокол производителя")
+Rel(local_edge_iot_gateway, water_filtration_system, "Передаёт команды через локальные контроллеры оборудования", "Промышленный протокол производителя")
+Rel(water_filtration_system, local_edge_iot_gateway, "Передаёт телеметрию, состояние и результаты команд", "Промышленный протокол производителя")
+Rel(farm_local_monitoring_platform, central_monitoring_platform, "Синхронизирует операционные данные из outbox до подтверждения доставки", "HTTPS/JSON, идемпотентно")
+Rel(central_monitoring_platform, farm_local_monitoring_platform, "Передаёт команды и подтверждения синхронизации", "HTTPS/JSON")
 Rel(farm_local_monitoring_platform, wan_connectivity, "Управляет подключением через основной и резервный интернет-каналы; переключается при отказе")
 
-Rel(central_monitoring_platform, erp_system, "Персонал, доступ, корм")
-Rel(central_monitoring_platform, external_metrics_consumer_system, "Метрики")
+Rel(central_monitoring_platform, erp_system, "Запрашивает персонал, аутентификацию, авторизацию и остатки корма", "REST/HTTPS, только чтение")
+Rel(central_monitoring_platform, external_metrics_consumer_system, "Экспортирует базовые и пользовательские метрики", "HTTPS/JSON")
 
 SHOW_LEGEND()
 

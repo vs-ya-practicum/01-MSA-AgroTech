@@ -21,9 +21,11 @@ Person(farm_duty_employee, "Дежурный сотрудник фермы", "П
 
 System_Boundary(livestock_monitoring_platform, "Платформа мониторинга поголовья MVP") {
     Container(central_monitoring_platform, "Центральная система управления фермами", "", "Данные, роли, API, синхронизация, команды и операционная аналитика", $tags="ctl")
+    ContainerDb(central_operational_data_store, "Центральное операционное хранилище данных", "", "Синхронизированные операционные данные; резервное копирование и восстановление", $tags="ctl")
     System_Boundary(farm, "Ферма (1..*)") {
         System_Boundary(farm_local_system, "Локальная система фермы") {
             Container(farm_local_monitoring_platform, "Локальное операционное приложение фермы", "", "Интерфейс, оповещения, локальная обработка, управление, хранение и синхронизация", $tags="ctl")
+            ContainerDb(local_operational_data_store, "Локальное операционное хранилище данных", "", "Локальные операционные данные и Исходящие уведомления; локальное восстановление", $tags="ctl")
             Container(video_analytics_system, "Система видеоаналитики", "", "Визуальные признаки с локально развёрнутой ML-моделью партнёра; не движение и подсчёт при наличии UWB", $tags="sw")
             Container(local_edge_iot_gateway, "Локальный edge/IoT-шлюз", "", "Локальная обработка и управление IoT", $tags="ctl")
             System_Ext(uwb_rtls_system, "UWB/RTLS-система", "Готовое локальное решение для позиционирования и анализа движения", $tags="ots")
@@ -45,6 +47,8 @@ System_Boundary(existing_agrotech, "Существующие системы «А
 
 Rel(central_management_operator, central_monitoring_platform, "Анализирует события, организует пополнение корма и планирует операции")
 Rel(farm_duty_employee, farm_local_monitoring_platform, "Получает локальные уведомления, проверяет условия, оценивает вмешательство, координирует ремонт и управляет оборудованием")
+Rel(central_monitoring_platform, central_operational_data_store, "Сохраняет и восстанавливает синхронизированные операционные данные")
+Rel(farm_local_monitoring_platform, local_operational_data_store, "Сохраняет и восстанавливает локальные операционные данные и Исходящие уведомления")
 Rel(farm_infrastructure, farm_local_monitoring_platform, "Размещает")
 Rel(farm_infrastructure, video_analytics_system, "Размещает")
 Rel(farm_infrastructure, local_edge_iot_gateway, "Размещает")

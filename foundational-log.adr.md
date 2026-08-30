@@ -208,7 +208,7 @@ The MVP requires local operation, offline work, real-time alerts, and synchroniz
 
 ### Decision
 
-Prefer reusing the existing Data Lake for synchronized raw events, telemetry, and historical livestock-monitoring data, subject to validation of access, isolation, retention, backup, and integration requirements.
+Prefer reusing the existing Data Lake for synchronized raw events, telemetry, and historical livestock-monitoring data, subject to validation of access, isolation, retention, and integration requirements. Require the selected central data store to provide backup and recovery for synchronized operational data.
 
 ### Alternatives
 
@@ -237,7 +237,7 @@ The existing AgroTech IoT Platform is external to the MVP. The evidence does not
 
 Do not reuse the existing external IoT Platform on the farm-local operational path.
 
-Implement farm-local device integration, telemetry collection, equipment control, local buffering, local notifications, and synchronization through the Local Edge/IoT Gateway and Farm Local Operations Application. Each farm operates independently when connectivity to external systems is unavailable.
+Implement farm-local device integration, telemetry collection, equipment control, local buffering, local notifications, and synchronization through the Local Edge/IoT Gateway and Farm Local Operations Application. The Local Operational Data Store provides local recovery of farm operational data. Each farm operates independently when connectivity to external systems is unavailable.
 
 The existing IoT Platform may be considered later only as a consumer of synchronized, non-critical data through a separately recorded central integration decision.
 

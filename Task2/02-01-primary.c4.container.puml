@@ -39,10 +39,10 @@ System_Boundary(livestock_monitoring_platform, "Платформа монито�
     }
 }
 System_Ext(external_metrics_consumer_system, "Внешняя система-потребитель метрик", "Метрики", $tags="sw")
-System_Ext(wan_connectivity, "Интернет и WAN-каналы", "Основной и резервный каналы", $tags="dev")
+System_Ext(wan_connectivity, "Внешняя связь фермы", "Основной и резервный каналы", $tags="dev")
 
 System_Boundary(existing_agrotech, "Существующие системы «АгроТех»") {
-    System_Ext(erp_system, "ERP-система (1С:Агро)", "Персонал, доступ, корм", $tags="old")
+    System_Ext(erp_system, "ERP-система 1С:Агро", "Персонал, доступ, корм", $tags="old")
 }
 
 Rel(central_management_operator, central_monitoring_platform, "Анализирует события, организует пополнение корма и планирует операции")

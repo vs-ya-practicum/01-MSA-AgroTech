@@ -6,7 +6,7 @@
   - [Decision](#decision)
   - [Alternatives](#alternatives)
   - [Consequences](#consequences)
-- [ADR-001: Name the Farm-local Software Farm Edge Application](#adr-001-name-the-farm-local-software-farm-edge-application)
+- [ADR-001: Resolve the Ambiguity of the "агент" Term](#adr-001-resolve-the-ambiguity-of-the-агент-term)
   - [Context](#context-1)
   - [Decision](#decision-1)
   - [Rationale](#rationale)
@@ -100,7 +100,7 @@ Use [Ubiquitous Language](ubiquitous-language.md) as the source of truth for can
 
 ---
 
-## ADR-001: Name the Farm-local Software Farm Edge Application
+## ADR-001: Resolve the Ambiguity of the "агент" Term
 
 **Status:** ✅ Accepted  
 **Participants:** Project owner; architecture modeller  
@@ -112,28 +112,28 @@ The evidence calls farm-local software `агент фермы` but does not defi
 
 ### Decision
 
-Use **Периферийное приложение фермы / Farm Edge Application** as the canonical name for the farm-local software. Preserve `(агент фермы)` only as the original evidence reference.
+Use **Локальное операционное приложение фермы / Farm Local Operations Application** as the canonical name for the farm-local application. Use **Локальный edge/IoT-шлюз / Local Edge/IoT Gateway** as the separate canonical component for local device integration, telemetry normalization, equipment control, and bounded raw-signal buffering.
+
+Do not use `агент фермы` as a canonical term. Preserve it only as the original evidence reference.
 
 ### Rationale
 
-The selected term describes deployable software running near farm equipment without asserting an unsupported gateway role. Its conventional meaning fits the required local processing and disconnected operation; [AWS](https://docs.aws.amazon.com/solutions/tactical-edge-application-deployment-on-aws/) and [Azure](https://learn.microsoft.com/en-us/azure/iot/iot-introduction) use `edge application` for locally deployed software that processes data near devices and can operate with limited connectivity.
+The canonical application term describes the software that provides the local interface, notifications, durable local operational storage, and synchronization. The separate gateway term describes the device-integration boundary without overloading the farm-local application name. Their detailed responsibilities are recorded in ADR-004.
 
 ### Alternatives
 
 - **Agent:** rejected because it is ambiguous with AI-agent terminology and the evidence does not define its software role.
-- **Farm Edge Gateway:** deferred as TBC because it conventionally implies an integration and connectivity role that the evidence does not establish.
 
 ### Consequences
 
-- Use **Периферийное приложение фермы / Farm Edge Application** in new diagrams and ADRs.
-- Keep **Периферийный шлюз фермы / Farm Edge Gateway** as a separate TBC concept.
-- Update dependent artefacts after changing the canonical term in Ubiquitous Language.
+- Use the canonical terms defined in the [Ubiquitous Language](ubiquitous-language.md) in new artefacts.
+- Use ADR-004 for the application and gateway responsibilities on the farm-local operational path.
 
 ---
 
 ## ADR-002: Choose the MVP Integration and Reuse Strategy for the Livestock Monitoring Platform
 
-**Status:** ⚠️ Under review  
+**Status:** ✅ Accepted  
 **Participants:** Project owner; architecture modeller  
 **Date:** 2026-08-26
 
@@ -143,19 +143,20 @@ Task 1 requires a primary and an alternative C1 solution that show which existin
 
 ### Decision
 
-Pending comparison of two variants:
+Compare two reuse-as-is variants that integrate existing AgroTech systems through their current interfaces and capabilities:
 
-- **Reuse as-is:** integrate existing AgroTech systems through their current interfaces and capabilities.
-- **Extension-led reuse:** use only additive extensions that preserve existing behavior; implement uncovered livestock functionality in the MVP.
+- **Minimal reuse-as-is:** reuse only the ERP System for personnel, authentication, authorisation, and feed-stock data; implement the other required livestock-monitoring capabilities in the MVP. This is the selected primary variant.
+- **Expanded reuse-as-is:** additionally reuse the existing Message Broker and Data Lake for post-synchronization events, metrics, and historical raw data. This is the newer alternative variant.
 
 ### Alternatives
 
-- **Reuse as-is:** lower change risk in existing systems, but may leave more livestock functionality to the MVP.
-- **Extension-led reuse:** may reuse more existing capabilities, but requires proof that additive extensions preserve existing behavior.
+- **Minimal reuse-as-is:** lower integration risk and fewer external contracts, but leaves central event publication and historical raw-data storage in the MVP scope or for later delivery.
+- **Expanded reuse-as-is:** reuses more existing central capabilities without modifying them, but requires validated contracts, access, isolation, retention, backup, and operational support.
 
 ### Consequences
 
-- Prepare one C1 diagram for each variant and record the comparison in the Task 1 ADR.
+- Prepare one C1 diagram for each reuse-as-is variant and record the comparison in the Task 1 ADR.
+- Keep the minimal reuse-as-is variant as the selected primary MVP context; retain expanded reuse-as-is as the alternative.
 - Treat ERP, Kafka, the IoT Platform, the existing web portal and mobile application, Data Lake, Data Warehouse, Analytics Module, and BI System as TBC reuse candidates.
 - ADR-003 records the accepted ERP reuse decision.
 

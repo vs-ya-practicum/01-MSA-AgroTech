@@ -19,13 +19,13 @@ note top of livestock_monitoring_platform
 end note
 
 Enterprise_Boundary(existing_agrotech, "Существующие системы «АгроТех»") {
-    System_Ext(erp_system, "ERP-система (1С:Агро)", "Существующая система персонала, аутентификации, авторизации и складских остатков корма")
+    System_Ext(erp_system, "ERP-система 1С:Агро", "Существующая система персонала, аутентификации, авторизации и складских остатков корма")
     System_Ext(message_broker, "Брокер сообщений", "Существующая центральная шина событий и метрик")
     System_Ext(data_lake, "Озеро данных", "Существующее хранилище сырых данных мониторинга")
 }
-System_Ext(uwb_rtls_system, "UWB/RTLS-система", "Готовое программно-аппаратное решение для идентификации, позиционирования, анализа движения и подсчёта")
+System(uwb_rtls_system, "UWB/RTLS-система", "Готовое программно-аппаратное решение, локально установленное в Локальной системе фермы MVP, для идентификации, позиционирования, анализа движения и подсчёта")
 System_Ext(farm_equipment, "Оборудование и устройства фермы", "Видеокамеры, кормушки, поилки и системы фильтрации воды")
-System_Ext(wan_connectivity, "Интернет и WAN-каналы", "Основной и резервный интернет-каналы фермы")
+System_Ext(wan_connectivity, "Внешняя связь фермы", "Внешняя связь для синхронизации с центральными и другими внешними системами")
 System_Ext(external_metrics_consumer_system, "Внешняя система-потребитель метрик", "Получает базовые и пользовательские метрики")
 
 Rel(central_management_operator, livestock_monitoring_platform, "Анализирует события через Центральную систему управления фермами")
@@ -35,7 +35,7 @@ Rel(erp_system, livestock_monitoring_platform, "Передаёт персона�
 Rel(uwb_rtls_system, livestock_monitoring_platform, "Передаёт идентификаторы, положение, результаты анализа движения и подсчёта")
 Rel(farm_equipment, livestock_monitoring_platform, "Передаёт видеопотоки, телеметрию и состояние")
 Rel(livestock_monitoring_platform, farm_equipment, "Передаёт команды управления оборудованием")
-Rel(livestock_monitoring_platform, wan_connectivity, "Синхронизируется через основной или резервный канал; работает локально при их недоступности")
+Rel(livestock_monitoring_platform, wan_connectivity, "Синхронизируется через Внешнюю связь фермы; работает локально при её недоступности")
 Rel(livestock_monitoring_platform, message_broker, "Публикует синхронизированные события и метрики")
 Rel(message_broker, data_lake, "Передаёт сырые события и телеметрию для исторического хранения")
 Rel(message_broker, external_metrics_consumer_system, "Доставляет базовые и пользовательские метрики")

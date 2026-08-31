@@ -2,6 +2,9 @@
 
 ## C3 — компонентные диаграммы
 
+> [!TIP]
+> Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>, чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
+
 <details>
 <summary>Платформа мониторинга поголовья MVP — Primary Component</summary>
 

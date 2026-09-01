@@ -1,11 +1,11 @@
-@startuml Альтернативная MVP-система свиноферм — System Context
+@startuml MVP-система свиноферм — Альтернативный вариант — System Context
 !NEW_C4_STYLE=1
 
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 
 SHOW_PERSON_OUTLINE()
 
-title Альтернативная MVP-система свиноферм — System Context
+title MVP-система свиноферм — Альтернативный вариант — System Context
 
 Person(operator, "Оператор", "Контролирует несколько ферм, анализирует События фермы и координирует устранение проблем")
 Person(farmDutyEmployee, "Дежурный сотрудник фермы", "Работает на ферме, получает Локальные уведомления и реагирует на проблемы фермы")

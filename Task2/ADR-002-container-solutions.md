@@ -104,7 +104,10 @@ Task 2 требует сравнить два варианта контейне�
 > Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>, чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
 
 <!-- preferred -->
-![Diagram](./02-01-primary.c4.container.svg)
+<!-- ![Diagram](./02-01-primary.c4.container.svg) -->
+
+[![Diagram](./02-01-primary.c4.container.svg)](./02-01-primary.c4.container.svg)
+
 
 <details>
 <summary>Диаграмма: MVP-система свиноферм — Альтернативный вариант — Container</summary>

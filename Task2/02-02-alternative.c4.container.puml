@@ -9,8 +9,10 @@ Person(operator, "Оператор", "Контролирует нескольк�
 Person(farmDutyEmployee, "Дежурный сотрудник фермы", "Получает Локальные уведомления и реагирует на проблемы фермы")
 System_Ext(existingKafka, "Существующий Kafka", "Центральный брокер для асинхронной корпоративной интеграции")
 System_Ext(existingS3DataLake, "Существующее S3-озеро данных", "Офисное S3-совместимое хранилище архивных объектов")
-System_Ext(existingIotGateway, "Существующий IoT-шлюз", "Внешний центральный шлюз, расширенный Центральным сервисом синхронизации")
-System_Ext(timescaleDb, "TimescaleDB", "Внешняя база данных, расширенная данными и схемой свиноводческих ферм")
+System_Boundary(existingIotPlatform, "Существующая IoT-платформа") {
+    System_Ext(existingIotGateway, "Существующий IoT-шлюз", "Центральная синхронизация")
+    System_Ext(timescaleDb, "TimescaleDB", "Хранение временных рядов")
+}
 System_Boundary(syncInfrastructure, "Облачная инфраструктура синхронизации") {
     ContainerQueue(dedicatedKafka, "Выделенный Kafka", "Kafka", "Надёжная асинхронная очередь синхронизации; горячая история около 30 дней")
 }

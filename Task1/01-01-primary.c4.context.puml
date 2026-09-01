@@ -14,10 +14,12 @@ System(pigFarmSystem, "MVP-система свиноферм", "Централь
 
 System_Ext(farmDevicesAndCameras, "Устройства и камеры фермы", "Кормушки, поилки, системы фильтрации воды и камеры на фермах")
 System_Ext(existingKafka, "Существующий Kafka", "Существующий центральный брокер сообщений для асинхронной корпоративной интеграции")
+System_Ext(dedicatedKafka, "Выделенный Kafka", "Облачная очередь асинхронной синхронизации ферм")
 
 Rel(operator, pigFarmSystem, "Контролирует фермы, анализирует События фермы и координирует действия")
 Rel(farmDutyEmployee, pigFarmSystem, "Получает Локальные уведомления и реагирует на проблемы фермы")
 BiRel(farmDevicesAndCameras, pigFarmSystem, "Передают телеметрию и видео; получают команды управления устройствами")
 Rel(pigFarmSystem, existingKafka, "Публикует Опубликованные метрики")
+Rel(pigFarmSystem, dedicatedKafka, "Синхронизирует данные ферм")
 
 @enduml

@@ -55,7 +55,7 @@ MVP-система свиноферм должна собирать данные
 <details>
 <summary>Диаграмма: MVP-система свиноферм — Основной вариант — System Context</summary>
 
-[![MVP-система свиноферм — Основной вариант — System Context](./svg/01-01-primary.c4.context.svg)](./svg/01-01-primary.c4.context.svg)
+<a href="./svg/01-01-primary.c4.context.svg" target="_blank"><img src="./svg/01-01-primary.c4.context.svg" alt="MVP-система свиноферм — Основной вариант — System Context"></a>
 
 </details>
 

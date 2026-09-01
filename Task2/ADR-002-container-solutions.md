@@ -53,7 +53,7 @@ Task 2 требует сравнить два варианта контейне�
 ### Контейнерная диаграмма
 
 > [!TIP]
-> Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>. Когда диаграмма откроется на странице GitHub, переключите страницу в формат `Raw` чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
+> Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>. Откройте диаграмму в новой вкладке и переключите страницу в формат `Raw` чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
 
 <details>
 <summary>Диаграмма: MVP-система свиноферм — Основной вариант — Container</summary>
@@ -101,7 +101,7 @@ Task 2 требует сравнить два варианта контейне�
 ### Контейнерная диаграмма
 
 > [!TIP]
-> Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>. Когда диаграмма откроется на странице GitHub, переключите страницу в формат `Raw` чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
+> Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>. Откройте диаграмму в новой вкладке и переключите страницу в формат `Raw` чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.ы
 
 <details>
 <summary>Диаграмма: MVP-система свиноферм — Альтернативный вариант — Container</summary>

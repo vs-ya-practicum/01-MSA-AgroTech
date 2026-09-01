@@ -1,5 +1,8 @@
 # Диаграммы Task 3
 
+> [!TIP]
+> Чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке, установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>. Откройте диаграмму в новой вкладке и переключите страницу в формат `Raw`.
+
 <details>
 <summary>MVP-система свиноферм — Основной вариант — Component</summary>
 

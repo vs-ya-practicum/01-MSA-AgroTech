@@ -53,7 +53,7 @@ Task 2 требует сравнить два варианта контейне�
 ### Контейнерная диаграмма
 
 > [!TIP]
-> Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>. Откройте диаграмму в новой вкладке и переключите страницу в формат `Raw` чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
+> Чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке, установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>. Откройте диаграмму в новой вкладке и переключите страницу в формат `Raw`.
 
 MVP-система свиноферм — Основной вариант — Container
 
@@ -103,9 +103,6 @@ MVP-система свиноферм — Основной вариант — Co
 ### 4. Альтернативы
 
 ### Контейнерная диаграмма
-
-> [!TIP]
-> Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>. Откройте диаграмму в новой вкладке и переключите страницу в формат `Raw` чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
 
 <details>
 <summary>Диаграмма: MVP-система свиноферм — Альтернативный вариант — Container</summary>

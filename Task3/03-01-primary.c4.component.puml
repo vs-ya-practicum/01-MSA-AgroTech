@@ -8,30 +8,30 @@ LAYOUT_WITH_LEGEND()
 SHOW_PERSON_OUTLINE()
 
 Person(operator, "Оператор", "Контролирует фермы")
-Person(farmDutyEmployee, "Дежурный сотрудник фермы", "Реагирует на проблемы фермы")
-System_Ext(existingKafka, "Существующий Kafka", "Центральный брокер для асинхронной корпоративной интеграции")
-System_Ext(existingS3DataLake, "Существующее S3-озеро данных", "Офисное S3-совместимое хранилище архивных объектов")
+Person(farmDutyEmployee, "Дежурный сотрудник фермы", "Реагирует на проблемы")
+System_Ext(existingKafka, "Существующий Kafka", "Корпоративные метрики")
+System_Ext(existingS3DataLake, "Существующее S3-озеро данных", "Архивы")
 System_Boundary(syncInfrastructure, "Облачная инфраструктура синхронизации") {
-    ContainerQueue(dedicatedKafka, "Выделенный Kafka", "Kafka", "Надёжная асинхронная очередь синхронизации; горячая история около 30 дней")
+    ContainerQueue(dedicatedKafka, "Выделенный Kafka", "Kafka", "Синхронизация; 30 дней")
 }
 
 System_Boundary(centralPlatformBoundary, "Граница Центральной платформы") {
     Container_Boundary(centralPlatform, "Центральная платформа") {
         Component(zitadel, "ZITADEL OSS", "Self-hosted IAM", "Аутентификация и авторизация по ролям")
-        Component(centralSynchronization, "Центральный сервис синхронизации", "", "Принимает и сохраняет данные ферм")
-        Component(centralWebApplication, "Центральное веб-приложение фермы", "", "Интерфейс Оператора для нескольких ферм")
-        Component(feedInventoryForecast, "Запасы и прогноз корма", "", "Формирует межферменные прогнозы корма")
+        Component(centralSynchronization, "Центральный сервис синхронизации", "", "Принимает данные")
+        Component(centralWebApplication, "Центральное веб-приложение фермы", "", "Интерфейс Оператора")
+        Component(feedInventoryForecast, "Запасы и прогноз корма", "", "Прогнозирует расход корма")
         Component(metricConfiguration, "Настройка метрик", "", "Настраивает операционные метрики")
-        Component(metricsPublisher, "Публикатор метрик", "", "Публикует метрики через Существующий Kafka")
-        Component(archiverService, "Сервис архивирования", "", "Архивирует холодные записи в S3")
+        Component(metricsPublisher, "Публикатор метрик", "", "Публикует метрики")
+        Component(archiverService, "Сервис архивирования", "", "Архивирует записи")
     }
 
-    ContainerDb(centralStore, "Центральное хранилище", "База данных", "Операционные данные ферм")
-    ContainerDb(centralS3, "Центральное S3 (MinIO)", "Объектное хранилище", "Видео, аудио и свидетельства")
+    ContainerDb(centralStore, "Центральное хранилище", "База данных", "Данные ферм")
+    ContainerDb(centralS3, "Центральное S3 (MinIO)", "S3", "Свидетельства")
 }
 
 System_Boundary(farmBoundary, "Граница фермы") {
-    System_Ext(farmDevices, "Устройства и камеры фермы", "Кормушки, поилки, системы фильтрации воды и камеры разных производителей")
+    System_Ext(farmDevices, "Устройства и камеры фермы", "Устройства и камеры")
     Container_Boundary(farmAgent, "Агент фермы") {
         Component(localDeviceGateway, "Локальный шлюз устройств", "", "Собирает телеметрию и управляет устройствами")
         Component(cameraIntegration, "Интеграция с камерами", "", "Принимает видеопотоки")
@@ -43,8 +43,8 @@ System_Boundary(farmBoundary, "Граница фермы") {
         Component(localSynchronization, "Локальный сервис синхронизации", "", "Публикует данные и отслеживает доставку")
     }
 
-    ContainerDb(localStorage, "Локальное хранилище", "Локальная база данных", "Телеметрия, события и состояние доставки")
-    ContainerDb(localS3, "Локальное S3 (MinIO)", "Объектное хранилище", "Видео, аудио и свидетельства")
+    ContainerDb(localStorage, "Локальное хранилище", "База данных", "Локальные данные")
+    ContainerDb(localS3, "Локальное S3 (MinIO)", "S3", "Свидетельства")
 }
 
 Rel(operator, zitadel, "Входит в систему", "HTTPS")

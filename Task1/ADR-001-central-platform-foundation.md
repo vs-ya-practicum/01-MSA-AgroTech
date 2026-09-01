@@ -14,7 +14,7 @@ MVP-система свиноферм должна собирать данные
 
 Каждый Агент фермы должен работать при недоступности интернет-соединения. Он должен сохранять данные локально и отправлять их после восстановления связи.
 
-Требуется сравнить два варианта реализации Центральной платформы. Основной вариант создаёт Центральную платформу с новым API синхронизации ферм и новым Центральным хранилищем. В альтернативном варианте Центральная платформа использует и адаптирует Существующий IoT-шлюз и TimescaleDB. Существующий IoT-шлюз предоставляет API синхронизации ферм, а TimescaleDB расширяется данными и схемой свиноводческих ферм. Обе системы остаются внешними для Центральной платформы.
+Требуется сравнить два варианта реализации Центральной платформы. Основной вариант создаёт Центральную платформу с новым Центральным сервисом синхронизации и новым Центральным хранилищем. В альтернативном варианте Центральная платформа использует и адаптирует Существующий IoT-шлюз и TimescaleDB. Существующий IoT-шлюз предоставляет Центральный сервис синхронизации, а TimescaleDB расширяется данными и схемой свиноводческих ферм. Обе системы остаются внешними для Центральной платформы.
 
 ## 2. Требования
 
@@ -41,15 +41,13 @@ MVP-система свиноферм должна собирать данные
 
 ### Описание
 
-Основной вариант создаёт Центральную платформу. Её API синхронизации ферм принимает данные, синхронизированные Агентами фермы.
+Основной вариант создаёт Центральную платформу. Её Центральный сервис синхронизации принимает, обрабатывает и сохраняет данные, синхронизированные Агентами фермы.
 
 Агент фермы включает Локальный шлюз устройств и Интеграцию с камерами. Локальный шлюз устройств отправляет команды управления, а Агент фермы отправляет Локальные уведомления независимо от интернет-соединения.
 
 Существующий Kafka остаётся асинхронным корпоративным каналом для Опубликованных метрик. Kafka не участвует в Локальных уведомлениях, управлении устройствами или работе Агента фермы при отсутствии интернет-соединения.
 
 ### Контекстная диаграмма
-
-[Исходный код основной C1-диаграммы](01-01-primary.c4.context.puml)
 
 > [!TIP]
 > Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>, чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
@@ -60,6 +58,8 @@ MVP-система свиноферм должна собирать данные
 ![MVP-система свиноферм — Основной вариант — System Context](https://puml.livingmodel.dev/a9f2k7xq/svg/xLtTRkF65RxdKn1fhnRTL3yKIRMR018btRG1WcoHNZH5GCjSHrXPSaawQxS8uBMJfeijiht8LGgq3GhqMhknKgsTjL-1V8K-ISyCX-AGCoI7bbSaDXnZROkSR-OxPyxvU3GYlSx3oUp0jCrzUTTwO1vEtTzOHsvlEjcRxLipLnx3DykM96VTxP5j7lnsikj-8hSQ3UhulddqdkKuvfvrV_97Isvs6ZJgrzQUDTiTpMUkCP_ERVad8zoO7drp_73FdX_ETeD-hctE7EW0DDY-StlNijb-L4VR6hlcR6zgtRitnPYURPdllYl_IPAXxQmd6pE3uFDu0lRSPzmfoA3tmL_Mt3q-i92rWIzQSSYkwPexfbC0yOT3wx10T_ZkJiQJ0nDMK1XaslRy4UbE5ad53H-XbYvnbC_0iftvhC3aOnU6pkgEpZZkCVZPV6GvytqB3S1VwXsqfAPzl5vepeWgvuJ1ZO8WpExZgNTDvnDhD-diyKE8-jkO2aFmH0TJSp8Bfi_82EI1hJH4HDZRLAWekENQ4RcPW-EvdysbiddW32sRH91rPRF0kPn9WfdeDRaZai6oVU9O422piRKpFoezI0AzecdaQLDEtkV1YNnaYGWkCmxiYMDzl47Si5xOG4ygGub8IsNuX2fJ6K94SCJuP6NORJY7rfpAU2WcFzK9f529k8nugX8EBguXMQE829DpxBZMVcL4gH9qY21LWaieHfKWGuGedyisHQWIdea9K3K29nGVXarXuIaqWeZeZ045x_yikpAwKnL6H7ggGYTKdwhm8G8aH6UR6bGL_yHag39152eHZr1XCIewo8qRT_OW8L8stiZ43LrfQVraD5976H-JpMB6nmsjtLU3uny4tMqmN6vryA71nDoRpymfETf8aRPIA7CqhNGUePYLJeIec0WFQbJ-qOqSGajOwLw9QLT9R5BptZe21f1h7uiGKtNqnNoi41qL9gRtqDU60b0kTzvEJsK8hRTwAiCetEifGkZsH8BdejY6JsNy5D_nAPcMbBsxaisdsLJr_Y39XpegpATjQ2EZiQ5Qb48vTVUbH1xndPSIYSHsNRQb13o7iBik9Ng5i-EoTJRvvO88iIvkIMBKqPBAXLAuPvKBfHDYoeNI6INBXUsAX72vKBgV-EL2IRJoxZZPR7zTz6Dq4OMuvSzkjdUVIYMuY7zsixsxLZR_RE9rtBnI2GyL_0ndcxUo27q2atj7I-5HyeHgypiIIXEhxL6_pRjVjYXQbI5KwEwNCiIhCfwwmLqmsnGnuVjNSeNiHYEHJtK0vbhoJyaDtBzJz2D5_tbJ_Jsufb6mtGv0wVODewUr107gS4HQloq0Q1eZgccvWEPm56jw7i0O9PgQ3T16J6jc0Pfi_r4t2w1o0ACiG9y7K380Gnv0om3m-YSyko5Wm0Ee6O1UKQDvRXrchlGmpuHDGuEpT9syy1vahHetu_fPutDJjBEUfDSK586srkltkshpzScCEA3LqNITqfQEhgjACnMW4Mi7NLLfjnKjz5TVuG8KRlOGI9C5QAEiDcWb0UeekmsRSK1xbDVwSK0_5n16YIGu0PX10xe2W56B0Wn402e54EbFSbLAqs2szOe2-jK3K3OqXY80ZGAe0lr9-95OqlCZenqFxwRIoMpjBQh6PybogfLVJzNLJbtjrDLENUq8LJku4adM8ibgH68g4ROMYLKZaa0b4gj6995AXAv6RdOvQ1UzfFM50C4gIi8Ja6f44gr4mcf44gr4mcILH2kHC9SaqQjuwAUA0NetDBguMzSBbr9WwCc5Qmi21apmvG0wJ7Xd0_fi0cK2ulMKbWk8foWHWGn0KWG2cKa5S6I64h9aImWPLK_PyvsvMuNTgHfGAg33r_XXbty5v1Sw0QJDlMIAl5Ec0G9l6MC09HDWi82Eo1jbSS1mCu3QxIeXm51QaRkY5m3eTdKYf3gkiZgH_rHwM2tybHHxKl268WJqw7S0kEflqO0E1WmeG3_gGz3jR02kUTSnqbxBU3fWrDEfgy_wHGOWrQrl5e1Uk96k9Ph10kZG636bRvSDZLZmQMgY6MpmRI4VRfRJsLif6WVG4T80MlaK8wq_hPM9TzlSLb-1tWX0ifhAsPnArcPv17hyhSDKW96LAHm0xztfK2cwnz7B0EX5jrrUDm2ypWN45aEA3Q-drErw3RYnMwiO6ji0yAuW1ZVZb40Y59r167fuZWOOqMcc6N4raCG-5eYCaLB49VNIB8bF4Er0r80QSEk0lCsf2WFM6PS3C9YSpW7eZ6fa0mn6bxIqlIQLqQM2vLJzN7pzN7pzNFoFzRdu-i7u-i7u-i7u-i7uea-wyV_OSlf39NKfKPSITIdnvfOIcSbVbnDrEL6N4tKvaLPEk1DtQidlVVZ-NV-nj_8V-wVUqll1MyZmyeMtybvvL_xdtj8_yNwG_tVojUpz0qx0GJY9lh-KuPS5d5rv2--LVuhxtCUFnSe6a0G39Oay6lRME-y0tBl6eorWeYl_vAFPHpFl6nW8i73qohi44YV-6VGvbM669SnsWGxxVqK_vP3BpsGq7_o3_jv_QSotqFkv_nI6N_dFrltzfxAtal5GCAjtZYsBKFuPiXpHGdEYKzvIzgune-Sm1xZaBPbIUDEHv_32HFy7ISoyhw7hzp3Q2HZq5Bm3zA_Gm33FEHxsWgA4ZVyNpFaSTOAVnEZ5ke-t14EliVrd_fTXZx_3WGjaEpW5JRC4_h0CIvZY2Z2NWGLWFPWCeooXwtTnjouIne5x8bf9In-OzlxWq3qUxXzCvyUMXVyMRVI_s22xXU87c_iVH8wu6lE7I7Y6RBn48G5Thx3T2xnSVmFUGNUQtzjf9qAZpd4SVGy3VeNClOovwyp_IiQpOwVxPm489aEl7iFfKsm4uWu7LsWIF3wAnLDav1Lsz2eC5EBcnxZh5tZ-Lr5C1WpESLm5IuMM4tfVebzVe5_nT0kIKz7Q8V_vpz0uRwC5MVzb3LYGWydU2DQ4f1cx6jw_IJH3VX9Z5YJy5oYcWDZJP1X-4pWU6Fy5kgr8sAs047v5Bsu0NY5_1Wlf_pbmrWla-tMcHLF5GthXVu4COlzcI1XgrgUJiUNqGCNCVSWnHsOD_1PuFa7YW8p3Ndu255xAlp8VF3InFMazW6iY076UWcISu301ZZXfiOey8Lhm4YtX9LhfHMAXYGPUOEzTu-z8sLQHF988yhwBF9LgldKqSTp9R0-R0GkxrfYxTw53VDb_8T-vawgSqUBUib32WUKwg01tvux4o4CQsNzkMST2RamytRkNJd699pedse5N3e-CPaGw0UeHXFeAk-Bgbp5z3jBz0jD7RaVP06olSRJ5ilkCJL70h81pd1Pc6e-BW2aC-nmlwaNe3hYqHWUncb2gipO0vJFCydy0)
 
 </details>
+
+[Исходный код основной C1-диаграммы](01-01-primary.c4.context.puml)
 
 ### Аргументация
 
@@ -74,7 +74,7 @@ MVP-система свиноферм должна собирать данные
 **✅ Положительные:**
 
 - MVP не изменяет Существующий IoT-шлюз.
-- Команда определяет API синхронизации ферм, модель данных и правила хранения для фермерского домена.
+- Команда определяет Центральный сервис синхронизации, его интерфейс и транспорт, модель данных и правила хранения для фермерского домена.
 - Отказ интернет-соединения не блокирует Локальные уведомления и управление устройствами.
 - Центральная платформа изолирует домен MVP и поддерживает бесшовное развитие в SaaS-платформу.
 
@@ -89,19 +89,17 @@ MVP-система свиноферм должна собирать данные
 
 ### Компромиссы
 
-Основной вариант изолирует новый домен MVP от Существующего IoT-шлюза и позволяет самостоятельно определить API синхронизации ферм, модель данных, правила хранения, правила доступа и операционный мониторинг. Он позволяет комфортно надстраивать будущую SaaS-платформу, но для этого приходится реализовать, развернуть, эксплуатировать, контролировать и защитить API синхронизации ферм и Центральное хранилище.
+Основной вариант изолирует новый домен MVP от Существующего IoT-шлюза и позволяет самостоятельно определить Центральный сервис синхронизации, его интерфейс и транспорт, модель данных, правила хранения, правила доступа и операционный мониторинг. Он позволяет комфортно надстраивать будущую SaaS-платформу, но для этого приходится реализовать, развернуть, эксплуатировать, контролировать и защитить Центральный сервис синхронизации и Центральное хранилище.
 
 ## 4. Альтернатива
 
 ### Расширение Существующего IoT-шлюза и TimescaleDB
 
-Альтернативный вариант использует и расширяет Существующий IoT-шлюз и TimescaleDB как внешние системы. Существующий IoT-шлюз предоставляет API синхронизации ферм, а TimescaleDB расширяется данными и схемой свиноводческих ферм.
+Альтернативный вариант использует и расширяет Существующий IoT-шлюз и TimescaleDB как внешние системы. Существующий IoT-шлюз предоставляет Центральный сервис синхронизации, а TimescaleDB расширяется данными и схемой свиноводческих ферм.
 
 Агент фермы и Существующий Kafka работают так же, как в основном варианте.
 
 ### Контекстная диаграмма
-
-[Исходный код альтернативной C1-диаграммы](01-02-alternative.c4.context.puml)
 
 > [!TIP]
 > Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>, чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
@@ -113,14 +111,16 @@ MVP-система свиноферм должна собирать данные
 
 </details>
 
-| Вариант                                          | Плюсы                                                                                                                        | Минусы                                                                                                              | Причина отсутствия выбора на данном этапе                                                         |
-| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Расширение Существующего IoT-шлюза и TimescaleDB | Использует Существующий IoT-шлюз для API синхронизации ферм и TimescaleDB, расширенную данными и схемой свиноводческих ферм. | Требует оценки пригодности и изменения Существующего IoT-шлюза и TimescaleDB, а также согласования изоляции данных. | Данные не подтверждают поддержку API синхронизации ферм, изоляции данных и нужных правил доступа. |
+[Исходный код альтернативной C1-диаграммы](01-02-alternative.c4.context.puml)
+
+| Вариант                                          | Плюсы                                                                                                                                    | Минусы                                                                                                              | Причина отсутствия выбора на данном этапе                                                                     |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Расширение Существующего IoT-шлюза и TimescaleDB | Использует Существующий IoT-шлюз для Центрального сервиса синхронизации и TimescaleDB, расширенную данными и схемой свиноводческих ферм. | Требует оценки пригодности и изменения Существующего IoT-шлюза и TimescaleDB, а также согласования изоляции данных. | Данные не подтверждают поддержку Центрального сервиса синхронизации, изоляции данных и нужных правил доступа. |
 
 ## 5. Риски
 
 1. **Несовместимость Существующего IoT-шлюза или TimescaleDB с требованиями MVP**  
-   _Меры:_ до выбора альтернативы проверить пригодность Существующего IoT-шлюза для предоставления API синхронизации ферм и TimescaleDB для расширения данными и схемой свиноводческих ферм. Проверить изоляцию данных, правила хранения, правила доступа и влияние изменений на текущих пользователей. Убедиться, что изменения не нарушают работу Существующего IoT-шлюза для текущих пользователей.
+   _Меры:_ до выбора альтернативы проверить пригодность Существующего IoT-шлюза для предоставления Центрального сервиса синхронизации и TimescaleDB для расширения данными и схемой свиноводческих ферм. Проверить изоляцию данных, правила хранения, правила доступа и влияние изменений на текущих пользователей. Убедиться, что изменения не нарушают работу Существующего IoT-шлюза для текущих пользователей.
 
 2. **Недоступность интернет-соединения на ферме**  
    _Меры:_ хранить данные в Агенте фермы и синхронизировать их после восстановления связи.

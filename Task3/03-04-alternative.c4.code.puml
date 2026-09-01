@@ -1,0 +1,63 @@
+@startuml MVP-система свиноферм — Альтернативный вариант — Code
+
+title MVP-система свиноферм — Альтернативный вариант — Code
+
+skinparam classAttributeIconSize 0
+skinparam classBackgroundColor<<primary dependency>> #FFFFFF
+
+note "Показаны только отличия\nальтернативы и их прямые зависимости\n(отмечены белым фоном)\nиз основного варианта." as scopeNote
+
+package "Граница Центральной платформы" as centralPlatformBoundary {
+package "Центральный сервис синхронизации" as synchronizationPackage {
+    class "Existing IoT Gateway Adapter" as iotGatewayAdapter <<adapter>>
+    class "Synchronization Service" as synchronizationService <<primary dependency>>
+    class "TimescaleDB Adapter" as timescaleAdapter <<adapter>>
+    class "Central Store Adapter" as centralStoreAdapter <<primary dependency>>
+}
+
+package "Центральное веб-приложение фермы" as operationsPackage {
+    class "Central Operations Service" as operationsService <<application service>>
+    class "Central Operations Service" as primaryOperationsService <<primary dependency>>
+    class "Metrics Data Adapter" as metricsDataAdapter <<adapter>>
+    class "Metric Calculation Service" as primaryMetricCalculationService <<primary dependency>>
+}
+
+package "Запасы и прогноз корма" as feedPackage {
+    class "Feed Data Adapter" as feedDataAdapter <<adapter>>
+    class "Feed Data Adapter" as primaryFeedDataAdapter <<primary dependency>>
+}
+
+package "Archiver" as archivePackage {
+    class "Archiver Service" as archiverService <<service>>
+    class "Archiver Service" as primaryArchiverService <<primary dependency>>
+}
+}
+
+package "Существующая платформа данных" as existingDataPlatform {
+    class "Existing IoT Gateway" as existingIotGateway <<external system>>
+    class "TimescaleDB" as timescaleDb <<external database>>
+    class "Existing S3 Data Lake" as existingS3DataLake <<external storage>>
+}
+class "Dedicated Kafka" as dedicatedKafka <<queue>>
+package "Граница фермы" as farmBoundary {
+class "Local Synchronization Service" as localSynchronizationService <<counterpart>>
+}
+
+iotGatewayAdapter --> existingIotGateway : синхронизация
+timescaleAdapter --> timescaleDb : чтение и запись
+operationsService --> timescaleAdapter : операционные данные
+feedDataAdapter --> timescaleAdapter : данные о корме
+metricsDataAdapter --> timescaleAdapter : данные для метрик
+localSynchronizationService --> dedicatedKafka : публикация
+dedicatedKafka --> iotGatewayAdapter : данные синхронизации
+dedicatedKafka --> archiverService : холодные записи
+archiverService --> existingS3DataLake : архивы
+
+iotGatewayAdapter ..> synchronizationService : замена
+timescaleAdapter ..> centralStoreAdapter : замена
+operationsService ..> primaryOperationsService : без изменений
+feedDataAdapter ..> primaryFeedDataAdapter : источник данных
+metricsDataAdapter ..> primaryMetricCalculationService : источник данных
+archiverService ..> primaryArchiverService : без изменений
+
+@enduml

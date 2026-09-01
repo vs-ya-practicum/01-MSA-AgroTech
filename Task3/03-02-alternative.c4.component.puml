@@ -13,8 +13,10 @@ Person(operator, "Оператор", "Контроль ферм")
 Person(farmDutyEmployee, "Дежурный сотрудник", "Реагирование на проблемы")
 System_Ext(existingKafka, "Существующий Kafka", "Корпоративные метрики")
 System_Ext(existingS3DataLake, "Существующее S3-озеро", "Архивные объекты")
-System_Ext(existingIotGateway, "Существующий IoT-шлюз", "Синхронизация", "", "alternative")
-System_Ext(timescaleDb, "TimescaleDB", "Центральные данные", "", "alternative")
+System_Boundary(existingIotPlatform, "Существующая IoT-платформа") {
+    System_Ext(existingIotGateway, "Существующий IoT-шлюз", "Синхронизация", "", "alternative")
+    System_Ext(timescaleDb, "TimescaleDB", "Центральные данные", "", "alternative")
+}
 System_Boundary(syncInfrastructure, "Облачная инфраструктура синхронизации") {
     ContainerQueue(dedicatedKafka, "Выделенный Kafka", "Kafka", "Синхронизация; горячая история 30 дней")
 }

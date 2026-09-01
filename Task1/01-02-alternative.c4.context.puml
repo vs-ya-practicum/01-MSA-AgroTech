@@ -1,41 +1,25 @@
-@startuml Платформа мониторинга поголовья MVP — Alternative System Context
+@startuml Альтернативная MVP-система свиноферм — System Context
 !NEW_C4_STYLE=1
 
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 
-LAYOUT_LEFT_RIGHT()
 SHOW_PERSON_OUTLINE()
 
-title Платформа мониторинга поголовья MVP — Alternative System Context
+title Альтернативная MVP-система свиноферм — System Context
 
-Person(central_management_operator, "Оператор центрального управления", "Анализирует события и планирует операции через Центральную систему управления фермами")
-Person(farm_duty_employee, "Дежурный сотрудник фермы", "Находится на ферме, получает локальные уведомления, реагирует и управляет оборудованием")
+Person(operator, "Оператор", "Контролирует несколько ферм, анализирует События фермы и координирует устранение проблем")
+Person(farmDutyEmployee, "Дежурный сотрудник фермы", "Работает на ферме, получает Локальные уведомления и реагирует на проблемы фермы")
 
-System(livestock_monitoring_platform, "Платформа мониторинга поголовья MVP", "Объединяет Центральную систему управления фермами и Локальные операционные приложения ферм для мониторинга, управления оборудованием, автономной работы, надёжного хранения, восстановления данных и синхронизации")
+System(pigFarmSystem, "Альтернативная MVP-система свиноферм", "Центральная платформа расширяет Существующий IoT-шлюз и TimescaleDB как техническую основу центрального сбора телеметрии и хранения временных рядов. Агенты фермы продолжают локальную работу при отсутствии интернет-соединения и синхронизируют данные после восстановления связи.")
 
-note top of livestock_monitoring_platform
-Канонические термины и границы определены в
-[[https://github.com/vs-ya-practicum/01-MSA-AgroTech/blob/master/ubiquitous-language.md Ubiquitous Language]]
-end note
+System_Ext(farmDevicesAndCameras, "Устройства и камеры фермы", "Кормушки, поилки, системы фильтрации воды и камеры на фермах")
+System_Ext(existingIoTPlatform, "Существующий IoT-шлюз и TimescaleDB", "Существующая центральная платформа сбора телеметрии и хранения временных рядов, расширяемая для Центральной платформы фермы")
+System_Ext(existingKafka, "Существующий Kafka", "Существующий центральный брокер сообщений для асинхронной корпоративной интеграции")
 
-Enterprise_Boundary(existing_agrotech, "Существующие системы «АгроТех»") {
-    System_Ext(erp_system, "ERP-система 1С:Агро", "Существующая система персонала, аутентификации, авторизации и складских остатков корма")
-    System_Ext(message_broker, "Брокер сообщений", "Существующая центральная шина событий и метрик")
-    System_Ext(data_lake, "Озеро данных", "Существующее хранилище сырых данных мониторинга")
-}
-System_Ext(farm_equipment, "Оборудование и устройства фермы", "Видеокамеры, кормушки, поилки и системы фильтрации воды")
-System_Ext(wan_connectivity, "Внешняя связь фермы", "Внешняя связь для синхронизации с центральными и другими внешними системами")
-System_Ext(external_metrics_consumer_system, "Внешняя система-потребитель метрик", "Получает базовые и пользовательские метрики")
-
-Rel(central_management_operator, livestock_monitoring_platform, "Анализирует события через Центральную систему управления фермами")
-Rel(livestock_monitoring_platform, central_management_operator, "Передаёт центральные уведомления")
-Rel(livestock_monitoring_platform, farm_duty_employee, "Передаёт локальные уведомления независимо от доступности интернета")
-Rel(erp_system, livestock_monitoring_platform, "Передаёт персонал, аутентификацию, авторизацию и остатки корма")
-Rel(farm_equipment, livestock_monitoring_platform, "Передаёт видеопотоки, телеметрию и состояние")
-Rel(livestock_monitoring_platform, farm_equipment, "Передаёт команды управления оборудованием")
-Rel(livestock_monitoring_platform, wan_connectivity, "Синхронизируется через Внешнюю связь фермы; работает локально при её недоступности")
-Rel(livestock_monitoring_platform, message_broker, "Публикует синхронизированные события и метрики")
-Rel(message_broker, data_lake, "Передаёт сырые события и телеметрию для исторического хранения")
-Rel(message_broker, external_metrics_consumer_system, "Доставляет базовые и пользовательские метрики")
+Rel(operator, pigFarmSystem, "Контролирует фермы, анализирует События фермы и координирует действия")
+Rel(farmDutyEmployee, pigFarmSystem, "Получает Локальные уведомления и реагирует на проблемы фермы")
+BiRel(farmDevicesAndCameras, pigFarmSystem, "Передают телеметрию и видео; получают команды управления устройствами")
+Rel(pigFarmSystem, existingIoTPlatform, "Использует и расширяет сбор телеметрии и хранение временных рядов")
+Rel(pigFarmSystem, existingKafka, "Публикует Опубликованные метрики")
 
 @enduml

@@ -21,8 +21,7 @@ System_Boundary(syncInfrastructure, "Облачная инфраструктур
 
 System_Boundary(centralPlatformBoundary, "Граница Центральной платформы") {
     Container_Boundary(centralPlatform, "Центральная платформа") {
-        Component(authentication, "Аутентификация", "", "Аутентифицирует сотрудников")
-        Component(authorization, "Авторизация (RBAC)", "", "Проверяет права по роли")
+        Component(zitadel, "ZITADEL OSS", "Self-hosted IAM", "Аутентификация и авторизация по ролям")
         Component(centralWebApplication, "Центральное веб-приложение фермы", "", "Интерфейс Оператора для нескольких ферм")
         Component(feedInventoryForecast, "Запасы и прогноз корма", "", "Формирует межферменные прогнозы корма")
         Component(metricConfiguration, "Настройка метрик", "", "Настраивает операционные метрики")
@@ -48,10 +47,9 @@ System_Boundary(farmBoundary, "Граница фермы") {
     ContainerDb(localS3, "Локальное S3 (MinIO)", "Объектное хранилище", "Видео, аудио и свидетельства")
 }
 
-Rel(operator, authentication, "Входит", "HTTPS")
-Rel(authentication, authorization, "Передаёт сотрудника")
+Rel(operator, zitadel, "Входит", "HTTPS")
 Rel(operator, centralWebApplication, "Использует", "HTTPS")
-Rel(centralWebApplication, authorization, "Проверяет права")
+Rel(centralWebApplication, zitadel, "Проверяет права")
 Rel(centralWebApplication, timescaleDb, "Читает операционные данные", "SQL")
 Rel(centralWebApplication, centralS3, "Читает свидетельства", "S3 API")
 

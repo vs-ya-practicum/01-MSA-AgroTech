@@ -1,0 +1,284 @@
+@startuml MVP-система свиноферм — Основной вариант — Code
+
+title MVP-система свиноферм — Основной вариант — Code
+
+skinparam classAttributeIconSize 0
+
+package "Граница Центральной платформы" as centralPlatformBoundary {
+package "Центральный сервис синхронизации" as synchronizationPackage {
+    class "Kafka Synchronization Adapter" as kafkaAdapter <<adapter>> {
+        Получает сообщения синхронизации
+    }
+
+    class "Synchronization Service" as synchronizationService <<application service>> {
+        Проверяет, устраняет дубли и обрабатывает данные
+    }
+
+    class "Central Store Adapter" as centralStoreAdapter <<adapter>> {
+        Сохраняет производные факты, текущее состояние и События фермы
+    }
+
+    class "Central S3 Adapter" as centralS3Adapter <<adapter>> {
+        Сохраняет синхронизированные объекты свидетельств
+    }
+}
+
+package "Центральное веб-приложение фермы" as webApplicationPackage {
+    class "Operator Web UI" as operatorWebUi <<ui>> {
+        Представляет интерфейс Оператора
+    }
+
+    class "Central Operations Service" as centralOperationsService <<application service>> {
+        Координирует пользовательские сценарии
+    }
+
+    class "ZITADEL Adapter" as zitadelAdapter <<adapter>> {
+        Получает идентичность и роли
+    }
+
+    class "Central Platform API Adapter" as centralApiAdapter <<adapter>> {
+        Читает данные и свидетельства
+    }
+}
+
+package "Запасы и прогноз корма" as feedForecastPackage {
+    class "Feed Forecast Service" as feedForecastService <<application service>> {
+        Координирует сценарии прогнозирования
+    }
+
+    class "Feed Data Adapter" as feedDataAdapter <<adapter>> {
+        Читает данные о корме
+    }
+
+    class "Forecast Calculator" as forecastCalculator <<domain service>> {
+        Рассчитывает прогнозы и отклонения
+    }
+}
+
+package "Настройка метрик" as metricConfigurationPackage {
+    class "Metric Configuration Service" as metricConfigurationService <<application service>> {
+        Координирует настройку метрик
+    }
+
+    class "Metric Definition Repository" as metricDefinitionRepository <<repository>> {
+        Хранит определения метрик
+    }
+
+    class "Metric Validation Service" as metricValidationService <<domain service>> {
+        Проверяет правила метрик
+    }
+}
+
+package "Публикатор метрик" as metricsPublisherPackage {
+    class "Metrics Publishing Service" as metricsPublishingService <<application service>> {
+        Координирует публикацию метрик
+    }
+
+    class "Metric Calculation Service" as metricCalculationService <<domain service>> {
+        Формирует Опубликованные метрики
+    }
+
+    class "Kafka Metrics Adapter" as kafkaMetricsAdapter <<adapter>> {
+        Публикует метрики в Existing Kafka
+    }
+}
+
+package "Archiver" as archiverPackage {
+    class "Archiver Service" as archiverService <<service>> {
+        Координирует архивирование
+    }
+
+    class "Kafka Archive Adapter" as kafkaArchiveAdapter <<adapter>> {
+        Читает холодные записи
+    }
+
+    class "S3 Archive Adapter" as s3ArchiveAdapter <<adapter>> {
+        Записывает архивные объекты
+    }
+}
+}
+
+package "Граница фермы" as farmBoundary {
+package "Локальный шлюз устройств" as deviceGatewayPackage {
+    class "Device Protocol Adapter" as deviceProtocolAdapter <<adapter>> {
+        Взаимодействует с устройствами
+    }
+
+    class "Device Operations Service" as deviceOperationsService <<service>> {
+        Отправляет команды управления
+    }
+
+    class "Telemetry Adapter" as telemetryAdapter <<adapter>> {
+        Нормализует телеметрию
+    }
+}
+
+package "Интеграция с камерами" as cameraIntegrationPackage {
+    class "Camera Protocol Adapter" as cameraProtocolAdapter <<adapter>> {
+        Подключается к камерам
+    }
+
+    class "Stream Ingestion Service" as streamIngestionService <<service>> {
+        Принимает и нормализует видеопотоки
+    }
+
+    class "Stream Repository" as streamRepository <<repository>> {
+        Управляет активными потоками
+    }
+}
+
+package "Видеоаналитика" as videoAnalyticsPackage {
+    class "Analytics Service" as analyticsService <<service>> {
+        Анализирует видеопотоки
+    }
+
+    class "Analytics Model Adapter" as analyticsModelAdapter <<adapter>> {
+        Использует модель партнёра
+    }
+
+    class "Analytics Result Publisher" as analyticsResultPublisher <<service>> {
+        Передаёт результаты анализа
+    }
+}
+
+package "Обнаружение инцидентов с животными" as incidentDetectionPackage {
+    class "Incident Detection Service" as incidentDetectionService <<service>> {
+        Выявляет инциденты с животными
+    }
+
+    class "Incident Rule Service" as incidentRuleService <<service>> {
+        Применяет правила инцидентов
+    }
+
+    class "Farm Event Publisher" as farmEventPublisher <<service>> {
+        Создаёт События фермы
+    }
+}
+
+package "Подсчёт поголовья" as livestockCountingPackage {
+    class "Livestock Counting Service" as livestockCountingService <<service>> {
+        Рассчитывает поголовье
+    }
+
+    class "Counting Result Publisher" as countingResultPublisher <<service>> {
+        Передаёт результаты подсчёта
+    }
+}
+
+package "Локальное уведомление" as localNotificationPackage {
+    class "Local Notification Service" as localNotificationService <<service>> {
+        Создаёт локальные уведомления
+    }
+
+    class "Notification Delivery Adapter" as notificationDeliveryAdapter <<adapter>> {
+        Доставляет уведомления сотруднику
+    }
+}
+
+package "Локальный буфер" as localBufferPackage {
+    class "Buffer Service" as bufferService <<service>> {
+        Готовит данные к синхронизации
+    }
+
+    class "Local Data Adapter" as localDataAdapter <<adapter>> {
+        Сохраняет структурированные данные
+    }
+
+    class "Evidence Storage Adapter" as evidenceStorageAdapter <<adapter>> {
+        Сохраняет объекты свидетельств
+    }
+}
+
+package "Локальный сервис синхронизации" as localSynchronizationPackage {
+    class "Local Synchronization Service" as localSynchronizationService <<service>> {
+        Выбирает и готовит данные
+    }
+
+    class "Local Kafka Synchronization Adapter" as localKafkaSynchronizationAdapter <<adapter>> {
+        Публикует данные в Dedicated Kafka
+    }
+
+    class "Delivery State Repository" as deliveryStateRepository <<repository>> {
+        Отслеживает состояние доставки
+    }
+}
+}
+
+class "Dedicated Kafka" as dedicatedKafka <<queue>>
+class "Central Store" as centralStore <<database>>
+class "Central S3 (MinIO)" as centralS3 <<database>>
+class "ZITADEL OSS" as zitadel <<external IAM>>
+class "Existing Kafka" as existingKafka <<external broker>>
+class "Existing S3 Data Lake" as existingS3DataLake <<external storage>>
+class "Farm Devices" as farmDevices <<external devices>>
+class "Local Storage" as localStorage <<database>>
+class "Local S3 (MinIO)" as localS3 <<database>>
+
+dedicatedKafka --> kafkaAdapter : сообщения
+kafkaAdapter --> synchronizationService : данные синхронизации
+synchronizationService --> centralStoreAdapter : обработанные данные
+synchronizationService --> centralS3Adapter : данные свидетельств
+centralStoreAdapter --> centralStore : запись
+centralS3Adapter --> centralS3 : запись
+
+operatorWebUi --> centralOperationsService : действия Оператора
+centralOperationsService --> zitadelAdapter : проверка доступа
+centralOperationsService --> centralApiAdapter : запросы данных
+zitadelAdapter --> zitadel : OIDC
+centralApiAdapter --> centralStore : чтение
+centralApiAdapter --> centralS3 : чтение
+
+feedForecastService --> feedDataAdapter : запрос данных
+feedForecastService --> forecastCalculator : расчёт прогноза
+feedDataAdapter --> centralStore : чтение данных о корме
+
+metricConfigurationService --> metricValidationService : проверка
+metricConfigurationService --> metricDefinitionRepository : сохранение
+metricDefinitionRepository --> centralStore : чтение и запись
+
+metricsPublishingService --> metricCalculationService : расчёт
+metricsPublishingService --> kafkaMetricsAdapter : публикация
+metricCalculationService --> centralStore : чтение данных
+kafkaMetricsAdapter --> existingKafka : Kafka
+
+archiverService --> kafkaArchiveAdapter : архивирование
+archiverService --> s3ArchiveAdapter : сохранение
+dedicatedKafka --> kafkaArchiveAdapter : холодные записи
+s3ArchiveAdapter --> existingS3DataLake : запись архивов
+
+deviceProtocolAdapter --> farmDevices : протоколы устройств
+deviceOperationsService --> deviceProtocolAdapter : команды
+farmDevices --> telemetryAdapter : телеметрия
+
+cameraProtocolAdapter --> farmDevices : видеопотоки
+cameraProtocolAdapter --> streamIngestionService : поток
+streamIngestionService --> streamRepository : активный поток
+
+streamIngestionService --> analyticsService : видеопоток
+analyticsService --> analyticsModelAdapter : анализ
+analyticsService --> analyticsResultPublisher : результаты
+
+analyticsResultPublisher --> incidentDetectionService : результаты анализа
+incidentDetectionService --> incidentRuleService : проверка
+incidentDetectionService --> farmEventPublisher : подтверждённый инцидент
+
+analyticsResultPublisher --> livestockCountingService : результаты анализа
+livestockCountingService --> countingResultPublisher : результат
+
+farmEventPublisher --> localNotificationService : Событие фермы
+localNotificationService --> notificationDeliveryAdapter : уведомление
+
+farmEventPublisher --> bufferService : Событие фермы
+countingResultPublisher --> bufferService : результат подсчёта
+bufferService --> localDataAdapter : структурированные данные
+bufferService --> evidenceStorageAdapter : свидетельства
+localDataAdapter --> localStorage : запись
+evidenceStorageAdapter --> localS3 : запись
+
+localSynchronizationService --> deliveryStateRepository : состояние доставки
+localSynchronizationService --> localKafkaSynchronizationAdapter : публикация
+localSynchronizationService --> localStorage : чтение ожидающих данных
+deliveryStateRepository --> localStorage : чтение и запись
+localKafkaSynchronizationAdapter --> dedicatedKafka : публикация
+
+@enduml

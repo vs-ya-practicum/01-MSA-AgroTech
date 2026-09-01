@@ -2,7 +2,7 @@
 
 **Статус:** ⚠️ На рассмотрении  
 **Участники:** Владелец продукта; архитектор решения  
-**Дата:** 2026-09-01  
+**Дата:** 2026-09-01
 
 **Универсальный язык:** [ubiquitous-language.ru.md](../ubiquitous-language.ru.md)
 
@@ -22,21 +22,21 @@ Task 2 требует сравнить два варианта контейне�
 
 ### Функциональные
 
-| Категория | Требование |
-|---|---|
-| Мониторинг | Оператор контролирует несколько ферм и анализирует События фермы. |
+| Категория        | Требование                                                                                                                  |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Мониторинг       | Оператор контролирует несколько ферм и анализирует События фермы.                                                           |
 | Локальная работа | Агент фермы получает телеметрию и видео, управляет устройствами, обнаруживает инциденты и отправляет Локальные уведомления. |
-| Синхронизация | Агент фермы сохраняет данные локально и синхронизирует их после восстановления связи. |
-| Интеграция | Центральная платформа публикует Опубликованные метрики в Существующий Kafka. |
+| Синхронизация    | Агент фермы сохраняет данные локально и синхронизирует их после восстановления связи.                                       |
+| Интеграция       | Центральная платформа публикует Опубликованные метрики в Существующий Kafka.                                                |
 
 ### Нефункциональные
 
-| Категория | Требование | Критичность |
-|---|---|---|
-| Автономность | Локальные уведомления и управление устройствами не зависят от интернет-соединения или Kafka. | Высокая |
-| Изоляция | Изменения MVP не должны нарушать работу Существующего IoT-шлюза. | Высокая |
-| Оповещение | От обнаружения нештатной ситуации Видеоаналитикой до Локального уведомления проходит не более 5 секунд. | Высокая |
-| Синхронизация | Задержка синхронизации не превышает 10 минут при нормальном соединении. | Высокая |
+| Категория     | Требование                                                                                              | Критичность |
+| ------------- | ------------------------------------------------------------------------------------------------------- | ----------- |
+| Автономность  | Локальные уведомления и управление устройствами не зависят от интернет-соединения или Kafka.            | Высокая     |
+| Изоляция      | Изменения MVP не должны нарушать работу Существующего IoT-шлюза.                                        | Высокая     |
+| Оповещение    | От обнаружения нештатной ситуации Видеоаналитикой до Локального уведомления проходит не более 5 секунд. | Высокая     |
+| Синхронизация | Задержка синхронизации не превышает 10 минут при нормальном соединении.                                 | Высокая     |
 
 ---
 
@@ -44,15 +44,13 @@ Task 2 требует сравнить два варианта контейне�
 
 ### Описание
 
-Основным вариантом принимается выделенная Центральная платформа. Она принимает данные от Агентов фермы через собственный API синхронизации ферм и хранит их в собственном Центральном хранилище. Центральное S3 (MinIO) хранит выбранные видео- и аудиофрагменты инцидентов и аудита-свидетельства.
+Основным вариантом принимается выделенная Центральная платформа. Её Центральный сервис синхронизации принимает, обрабатывает и сохраняет данные от Агентов фермы в собственном Центральном хранилище. Центральное S3 (MinIO) хранит выбранные видео- и аудиофрагменты инцидентов и аудита-свидетельства.
 
-Агент фермы работает автономно. Локальный буфер подготавливает данные к синхронизации, Локальное хранилище сохраняет структурированные данные, а Локальное S3 (MinIO) сохраняет бинарные свидетельства. После восстановления связи Агент фермы передаёт данные в Центральную платформу по HTTPS/JSON API.
+Агент фермы работает автономно. Локальный буфер подготавливает данные к синхронизации, Локальное хранилище сохраняет структурированные данные, а Локальное S3 (MinIO) сохраняет бинарные свидетельства. После восстановления связи Локальный сервис синхронизации публикует данные через выбранный надёжный транспорт в Центральный сервис синхронизации.
 
 Существующий Kafka используется как асинхронный корпоративный канал для Опубликованных метрик. Он не используется для Локальных уведомлений, управления устройствами, автономной работы или передачи видео и аудио в реальном времени.
 
 ### Контейнерная диаграмма
-
-[Исходный код основной C2-диаграммы](02-01-primary.c4.container.puml)
 
 > [!TIP]
 > Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>, чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
@@ -61,23 +59,26 @@ Task 2 требует сравнить два варианта контейне�
 <summary>Диаграмма: MVP-система свиноферм — Основной вариант — Container</summary>
 
 ![MVP-система свиноферм — Основной вариант — Container](https://puml.livingmodel.dev/a9f2k7xq/svg/xLtTSjl65Rx7Ks2INhGQonB5NpcEPaXAdAPD6hVoj1Tn9WDBiConHAeaNTjfCcDBjTDMcJXfSz5fPvncEcrlALkqQLccNm5yXJv9ppcBdmLs0In4cK1TWcDQ1FRR_VRiETyUB06mUwFPsZKwnew-QLupRcxtBfktUzNjvbPhnsprz0ruCpkQrdMBtUeOkxzgRlQkwqkBYzp-7UFs1sQtQsoPwyrFJJrNNEHHxvjRPckpqMxrwktjTaT_kq6RKA9cRDpOwhHljZPPkLx7Q7MX0D0GoxOxcsP7BCSLx9WRFQErjMrUlBXDc6h7D5PMzDzgEcnNtSOsX4heE3KW7ljSseHTwJhOosptxkoQs5jcYoK_PDFe6LUDRWB4hs-QDnCKX_TUSwEvQy08AeECJgTzoovk3rA9Djh33LrWhvo1sUcsMmaQt-X1rL75yKYtTmViRDmok-qT4okG3_LL75AZSySTQ4cD9Sc1kjGBc9kjKzERHlUwkHaqziODyFgpQ8eWrD3kjj5iiUOZ8W8jC9KDYIXRctEL0csn_V3CBC79p2_6KjeyA4BJ9i6YBcqM5CkH98I6NfCvF1bCsoPT4noajM5URTzEtKcONl4quhGf9kxZuBPyH8a8fHcxdMRN_6G2ln6jC86UP8QIBIsPuUEeJ6O8sOAZnYSgmix2EBpcPCP2Fld9ZYCvIYHb95CLft9r3OcgHKMOkdUwFNCdCwAK2Jgs86M2YoD6cI1Z2r4ybscAK2OiunEWR3YE8pu2cyJ2awW65T7P01IS_vcTpEXELXZPqfCLEexwP8MFBK1ATAQfGLcnZq-6CkD4ZXB922KMewILd7gJjiu28cJXpMvuiL9OAjU2tiZj5MniBnOBDbuivsibjlyNh7W7Egul5MdNQjFOQhUCRNllOeYqfK9Peccfyt34B7KYjegfyE1gbU-To22yXALk5PzsfSGcDExDsy00OkqJ5MAb2hw4hnMylSh4AbLyJIW0wNANhVHaXf2xr9CPHivQJn92PoSICXFv5dmoOoV_Ya_AjBJerPLeFhbSgL9R3VBXzYhpoTVBZVhYX6gH2kNGrPSKUVXNNb8aubjrcPOIo0mYhhgaQ1N9YilKsSId2oh4bcaB4kFsffGkfC8zAbr8dP2GBgJEA9WkJ5SabDE5rEqaJnTIeXLtnSbaw-kgNwEhACGPVtSplUjKCi55_RkRwLsrClbt4w_ZufLCM2ZXTpZJl9H5wHkOs2jQ4jSI9rIJNv6GcbXDZ_fPNlqoHT7A3A54Lx-a8LwPiTGfheAPfeWfNxyIAsIdgid-LWTWFLF_WNq1zqU5okr2PI5N-XXCivXmEnj0ORbMhrVBIug0qbh3tcfv1K2ktk2sSYmWjzRmRPKuGBqHs4hHW793s79HW9nOlh4S1IX908qeG4q6A4G0rcI0SWH0LZvWsGa1gp90AG9GJTffcLdN8aTwBQuBaxg6PEYASUwz6ZLgqeYhHTKl3T6YsqWrfoW2-NArLbikvLwVpAW3behbIeNJbcAbKYhaGW5bkxUhowL2FbyeE_Qg5QI0WZHwR4XE19GRKTlgKX1GQaHlQpa_8D-8ssf-G2qMu7Y9fjW0T8C7B2i06aiSO5K5KE80AkNjMDN2D5ZSgaa1jUm1k3uihga0oXoWf53UTZ_Rbohndf7tktUkK8pSybDKZS-3wTHIV3urotPcsSuisvbbEqhP3cKYmLmac8reGYOYvYA-R4HJo4HysOYcaedmsSZffeDyqYcjfWHWewWfDs1d8vfg9k9a8vfg9k84gwQQYJYnfAdEuewTCWQedhBJoStg3bn8Wb493bnU4R0gE5yCe2YuTpIW9WPG9C2VJvLZ0VuGjKKW0X0K0IOpeG29p7125jm2GiRbKvtsrNOl2wjJCq2gWA9SuzUMvJEWFD5XaBnqobGvK-O12gUCFa0X4b0N0KML4sLrmDfaWDBoSi41r0jBdhcy3m1ONgxOGbgXBAlesQ_4Lrjs_hIJFOsTK3Y0Ady6G5d_4Wye4c2L0zIyCZOw7msWdDVraRmhu-60HhN2pJxkXmX0g5dVB00_S8rAER3LHG3l6WqXzLqMNSFdVELIOAkBpZU5U3XTJ4SlfPGbWAAI1l3ALwY7bUUrCd2sBTrcCz0R0GXcKp6BKy7SB8v0LRvq60geHqMA120xErqh95tZg4O0AacNNLut0Amk1VW6G_DLNmd9soipmAdDcaNNc0P0DeFKfH5NO19Hg0Y8UiKvnWFgtc5Xg_lLG5FxMi3hZ1OYBg5JiwRUWBS2CGFC06SEY5kSoZ30ZRWOG5s8wHX0HL2DQ41TqALos5fJIT2bXEdKxBxusNtni_lY_r_lYv_T63-xCNvsO_pinlYaTxebVSIE-u2VQBQ5V6LrjIXSpkxjdUvjyscnZdfuM8fKX0U7fSWb-D2mhDn2dmNRo1yODdL2yUc58hTQ7bz1RjnUPMxL4hxEAiD8YtvKaf45JaAUaGLImLHZwieXCvGqsyY2jUG9HthCucvQdVZXaQdTipervcVuaD8fth6Q5Jv97bAQnlsgMR5JyeULJlDkLTNdZCRUh7gQYe9Rhza3kX_yyjBy-9ur7DyRxra3wyJgw_3niJMqNbgZyU-imVYkTQB_v-wtklK83i1EE8ZlptNuemz7XrRVUZdUep9rXvUcNMzkcdhNvQIntvBIEysjwptjiulq2r4NtcOBmIjpS-pdgURcBYxGaHNzCoXaBp2jE3-DHFlOqvLMTFRa0RQF9OehkciNjfkTPwxepWpYguSzReKxo5V8PWlk85yp46MzOND2-BGmMy6UhM3FLh3Vt1NioE2VhMBFLh5dgzYpLUomLMmx5tdhtNSXjR9UKQRLXoHiDBvxfNMbPVqLaYp8gs3lo7e12ThTyJwKsTCX-nf09dQCkyTVul-wawUTqp4NWtzGtdh6Oxw7qeVZ0wX-E7xebXyVwDPGfwgWLUk8iZuETGGPuNFA31yZxYsTargZgxVXWu6_GUdhoxS0UZhUX_fUZWyWJGIk8-m6L7g4rLl7NFlKq--eA_lZBu0vjVits76CtO3-OIK37S2FeTuZE702lHiGpuV87kePGD4dVWlrTUiLMUwGIcDFlKQ3_RXcT7PMR_RkhEtiRhVlc2QgklSJfTIfxu7U7z3kQ0lu-oluD8JE_TIuTiEWJlmBIT5mURmXHpua5iVODDhp1PBkOy8D1UxJiPTEEdrCW_2Atj4HXbwcZQKnFNz2Xnx0vo5sGdpe8FJ6lDtizfgjBQ96FveIwCkVYICQy07QII3Ecdm5XWCMOBMHCrGNkyrFpGkvfPMFM7iVNrp0FIj8HNWEcEyd-u0M_YfknzY-j6tqhhKxEpNxe6x7dS1IfDL7smLeMVqhhOK5ZvZr7PsH76CfSZSvo66-iC0Sa43ecoUE2nwHYPZpeV_grjVWOqG9Ju4uRph7N8sSa_oZ3-C6uqprW8b5jy0QtO2dmJode_kFly5sZcsIs0f69_FZ9pGk5DDq2aO3Q0qmudLgyzXwYXM_WXWufFW_TgBX4R_J1Tj4Jh2CRJFoANwHJHmstHuiz-TuGyPgX35xtt4qqYy8dy1O_JDud3Fx-Bx41GF3vkBHqFwG6WPCPVUM7rLEDFsZCPANnx4WQv5dSVMmq-KZEZJ0_ZEL23VcEcYccSIIwtdzXnyqM-zz-AE01H-1llmH8CVGO9ZH8um6KdP02iNrqkwBDPgd7lT9jeUu5a3bdg0DYE81awK7TdadC3WGcce-p3nMFy90UPsbrv7AnSyY4qaJwd-i7lq3QPD7EJDYtvuy--GMTtrJZ3E3qwVzyUynkb0e08u3Gv_uPHS67f9vzZnTmE4OMKVkFCqrXPPuvaOA4KEdf_9a-W7DVCz3vmcQzSpVD3VChYxligjulexv7D0tKvC3Edf514_W1RlduSzNyEhRCvljgY2QO9a1KxA0c_uT88Sel8uWWwgIXxsa503UsJJlCBC65vXv-KJ2jOAhSkElT6PLsybHU8cnJxJtnR66AeQa58SqgM2gyPHcQ9jU81HeMa3smRgJvJPIKVEoCoviCMsuXsXo6M3DPYAsNkTLYj48J9v9jHuzehg5Fs4lrIPnh6CLtW-XkVYG_BRla_eeNPSCuRdmVFPSCessZSpcxH4OXbnHPdSt8750XpIs0DgdTqgFMKssST_HCRHjV_pIUiQ638e-51tW19F4VRiBu0AIWTbkRx1P0typNN5iGkSCISYE_fUd4SKX2JKhcslSSvdvUJWOp7ekw7Dprb_44PsRynltnvSlNrhtBAK9PnPKknTdLE-fJt_cvZHUnELr3-pSj0_dB2gAI4goHmpGZJb9fGeeWpoXaSPfYLTFZvOa9tVgnDeE8YSipdp1OU37XYLHrCb_Cn-nXLZ7Q0NUEBSUU0BjKqlLSvvWLzP__huglJpZ1aBbn98p0u1NVi4n3Zb527TuWLHUhrvwB-1rp0V2dVdxg9dbXLyYc4GwlVWc93rEF0D9WsVX9-iV_kmTMkJ0kM94o86UMqHXHyhxI90YdXCahXhwtefEyjoHFQ4EK1JWMHvBE8RX1lF9BLah697FEStsMoTaZE_PAo2WiBGq4drk8aHGudbKtYLbd_HxmAJ-A8qJ_p854wj9pbq5ctqTN6MXSQFcE6vQgzs3EJHPMYQ87XMN9uriTYGPHNEZYB8yu35pPZPtUOiB_U3g74N2CseD9UqXccNaf9nxL1HN1FVcHISdkcWxrktpC6y_8hWlYtMB_icT0znLH5g6EcRgU8GvTp1xU8Bo468f4ldnVKVWXQ0kebCDQB1XDZd_5ix9hPpMokddptiJsNy1)
+
 </details>
+
+[Исходный код основной C2-диаграммы](02-01-primary.c4.container.puml)
 
 ### Аргументация
 
-| Критерий | Обоснование |
-|---|---|
-| Изоляция | Новый домен, API, модель данных, правила хранения и эксплуатация не изменяют Существующий IoT-шлюз. |
-| Автономность | Локальные данные и свидетельства сохраняются в Границе фермы; локальные реакции не зависят от сети. |
-| Развитие в SaaS | Собственная Центральная платформа не связывает будущих клиентов с текущей IoT-платформой компании. |
-| Интеграция | Существующий Kafka повторно используется для публикации Опубликованных метрик корпоративным потребителям. |
-| Технологии | HTTPS/JSON используется для синхронизации, локальные протоколы производителей — для устройств и камер, Kafka — для асинхронных метрик, SQL — для структурированных данных, S3 API — для свидетельств. |
+| Критерий        | Обоснование                                                                                                                                                                                                             |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Изоляция        | Новый домен, API, модель данных, правила хранения и эксплуатация не изменяют Существующий IoT-шлюз.                                                                                                                     |
+| Автономность    | Локальные данные и свидетельства сохраняются в Границе фермы; локальные реакции не зависят от сети.                                                                                                                     |
+| Развитие в SaaS | Собственная Центральная платформа не связывает будущих клиентов с текущей IoT-платформой компании.                                                                                                                      |
+| Интеграция      | Существующий Kafka повторно используется для публикации Опубликованных метрик корпоративным потребителям.                                                                                                               |
+| Технологии      | Выбранный надёжный транспорт используется для синхронизации, локальные протоколы производителей — для устройств и камер, Kafka — для асинхронных метрик, SQL — для структурированных данных, S3 API — для свидетельств. |
 
 #### Последствия
 
 **✅ Положительные:**
 
-- команда самостоятельно определяет API синхронизации ферм и модель данных;
+- команда самостоятельно определяет Центральный сервис синхронизации, его интерфейс и транспорт, а также модель данных;
 - изменения MVP изолированы от текущей нагрузки Существующего IoT-шлюза;
 - проще контролировать доступ, хранение и развитие в SaaS-платформу;
 - отказ интернет-соединения не блокирует Локальные уведомления и управление устройствами.
@@ -99,8 +100,6 @@ Task 2 требует сравнить два варианта контейне�
 
 ### Контейнерная диаграмма
 
-[Исходный код альтернативной C2-диаграммы](02-02-alternative.c4.container.puml)
-
 > [!TIP]
 > Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>, чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
 
@@ -108,12 +107,15 @@ Task 2 требует сравнить два варианта контейне�
 <summary>Диаграмма: MVP-система свиноферм — Альтернативный вариант — Container</summary>
 
 ![MVP-система свиноферм — Альтернативный вариант — Container](https://puml.livingmodel.dev/a9f2k7xq/svg/xLtTSjl65Rx7Ks2INhGQonB5NpcEPlWZjcwJngqyxKMIoS0IB7CiaIe9rrQQpCXMxQHLnaxIN7JQ6QUPJjjRoXPZMfRfLm1V8K_IisSNm0Ax01QYJA0keR4i0lljVdlsd6_FBWcmTwFLtZ6wnhQ-OLupRcvPLypRLdMhjTdUDjkMlWw_pAwczTnYjxh6pczR6zPrVMbnaJk_RTn-r-prZ4rphVMngUUAYppg7NFJR6yqEsshtjdgTFKtctW89Mh6-etDRkTcUuEMixf6kmS5W8POjjFTCBjYEQvWrrotZFRcbddnuXPYgbtJM5dH_w3fS5nr6riNAi7hs81uxLDf4wpIDR2NsR5sTqpIMsgB9Jzamx2CgqOl0U9tDysR2Oh3RwkrtjenO0ILGKQtsxd5YhD1Ak61PxYX2voLCp2xlKuxGUFh5bGTLPnSwLcxO6VZbjdhR9ka0lbGNoL3QdHttO6Mr5YINAXBlO2wsHeslM7qhfiRGMEltm2lFukc488DxMmPhJPjFY8YY0McSX0YojRcNAM0Hsm_F3DBS3BpYx6KDW-CqBH9qAXBcmN6SYG9eQ5NP0vF1jEsISy41sclcrSxjrDt4gfNF8quROg9-pWuauye4S4qOwVRwfaVJU0teXKcq9FCK6BIaXa-ZifaXX0J73K-KH5s5iRXDISp5lB9JtOSoL4YAIEPgZYLgsj8L2qgmjJRxLdcTcP4AHDqc21bWeiZHfaWmuGediiqHIWJbl49K3OSnn4VWKrYuKbKWuheh0CArdzcDpEwanL6J7goGiTHdwpmOGAaH6UQ6fGL-_XaA3DEv2YHZ51YCKfQoQaFQUiq848stbZ3YvN2KhaMz4Rkh61Zjbais7YndA-LwFbVq-9TwBY-LCHJZPQnsMaRM-piOeYqfK9Peccfyt34B7KYJCLKU72roizEP11UmbAtYa-xKc8J6lVcRM00iVQH2h5IXVm8RojuPvM9LQhaPq81I9UxRASdCuJShPxCC7BsUf8GEZkHa9d8j-6J6JlvTtnIfgL5xwv4yydbIfLQ8yY7EwlC9rylD-kB4wf5AfH3TrzIvE7VUKcHY6_NPLfA83E8kEkIebKaEovJPnEVBgWGMyOZI8mxcrAwa0htg7GXTK92kf0wes2wC5sHK4uNKhUJF5r8YLRS9qucsrzNVHjTHI7E-BsRwNrE9HDSrD-xcTwdLYP_R-9LV7Wb4nPA-1xED3_AelGEJEmdMXBN4YTKatyY8JMncXxri_pqonH5ApE44dtw9GtnoeobJl4fc6cAcFBdLsA5x5GriNTr06QP-e_O1xZVBrHk5oeBkTA7O9h5XCVP00hBjNgzMbvI19HMc-oevHK0kNgJEygnWDngqtTKuW3rPk0eHGFAJU78HG5oOldcSXIW904qem0r6Q0G0LYL0SeH05dvW6Kd13HaW584e9gqqpAphaQEz6fS5oPr3SdG5UFSkn4rQjA8gqNLBmtHejj8DQSe0lbojLPRBkLUdSoe0vQAvKg5qvPYfL8gv481PTRRndAfaCyNoewzQWKfe22D7WR9YO1oC-feB0K1fMRqiPhp0_BDkAFc1zHY0OwNQ8eDG3TumB82eBd40HegW187K2dFObKBqs3ng2O5rB87uFgmkAe2A7E0aa9vvdxCbohndf7tktUkK8myybDKZK-3wTHIV3urotPcsSuisvbbEqhP3cOYmLmac8reGYOYvYA-R4HJo4HysOYcaedmsSZffeDyqYcjfWIWewWfDy2o4Kqr4t6o4Kqr4t62LLFDH9nOqbHdSSTE6GDKJzdfv6Pr1ouamQW41owl26W8pXS3A0hk7GseYG4K2V3dK-LOW3z4cGX4088YG6Kc522H6Kx8WaT0oBXygjkvsh6oi3ir0wGAACerVdLPFWFA4nqAoKkdJ9MLCWzGM3Bw08L8G5q455KMokg0rSa0fUNbWWEe5vOyStal0B2yN652Mi4ig-ZPhyHNMtR-PCcUHXSK3g3Ahm0mwr_Y0KK4D3X0pIl3qFbe0EQyhe_aNHaF1pIh5MxsSLz404BD-de1-85hLig1eou2UDTe2gdlikWQFkShbm97NNI-ASJ3wM8wUYkbB04KbJI0Lxv2FQmyhvM1rRRqcCr0hmKWc4t5R4u5SxCu0bNvrc4ee1uLAHA0R7MwMaYwnr6D05IIRhkyQW1ONGhm3ORcgxuIahTNPe1JcpMBhZ4DW6m6gKiZha0beb0H4FMASuq7rBtBmb7tgu6czhQ0rnajH5n2fsPDlG5l1s86c07E712tEPLXW1jnCO2w4DCnW8gW6j60kg1BvR2zffAWImdJgTbzyRFxucVtnV-_tXS_kp5-TcFyxCRusOtnIUzqI_g87VS1Fz5i2_bAer4KFixkdPtkRVDfiOvwU5YAL8G7XwN89VZGiApSGfy5syWV63PrGl7fXIAtMfxy1BbnPvMvLKlavwmoZBJeHoKPMU0av1bP81LCDQQk7393IREDB5XBdd2anopkfjM97nwPsZshKsD-XWyfdU8TgrdXa-GXfMdShveLEoL_MEaqxrPLVSvexCsgfwaeU5Wj2-Y--vlBy-Cxzd1yPtpN7jWdTb-7bu_jeVt27et_Q0_6U_Q9_iFUDxhzfVry_0Kf1QTUs7tuQmW5NumFx6Sw_D67qqEx3oVkOlcwmr6xtjemzPvBJwDVAwLtMvlNBUsJY_XbKHVUf7l2AtDpz9kgvkOkBk2L5VqJACJscbQSRqd2S_H1IoiwVGW1FKTpnXNTDH4zJPUSAxepcVZgeKzUuIxo5TA9Wxl8rmn4QM_ez10-GymsisURsRFDxDTtCpio-6SRshCDxTc6zcn3Esn3c-KYRxpzjcu_ibzYXaNogz5uxuFs1stxR_Q8f5LmTcG_XrnjRxmFPUxga8OD85ix9gV7Nv3_TITbEwUJL0p-GNdxAO_v3aeVZWz8-ZP-w9OV7-ZsKCUge5Nx21D03dK4oU4pJ18V4zmREYUrHa_lm0k3V1sbho_V0EZxyJx95p5B1AuZqWsez8XKRnzpxMDFlyMkx8y_0-ROxj_Xn37f1lIFL3BG0VmOwZs22oVGkm7oV4ZOGpq3AFh4Rw6-Rhz4onrYQT9Jhz5WFwuPtUt6JMjtTNjdgxDhcaJLlMyhnKvz1_J-HEnER05_Fu1NG-ZSBunhDmpinBy9AHmkZpUao8V8ufWqJUpvd93kazmR2jp3Qoz8qasA7kCWlCJVRg9DBv7I95D_WfVkm-iXwOJu_47eZNcxrRDQxKsabg0hbpfNviUV0yC7zbFiqTVeQP_ZcC4mtfTsq46Sqv7Q7NWzn25vmGfKBr_I0_qblibwuOvAR7SkTQoV6fPvozWL-tIbjMtsreqjir7pCny_9FO-1CPFYKiSONW0h_4z6Lzu_P0h19usH0-xCxw7gwGHzMQsJeB_H_OHE2sDnk7uNdndB9VeLVnccy3G_0MDIrpxFg4hk1HrXfVWqk0VqDZ82QABlTR7veNSqihxjBKFBowGCok4YF2mDj_tAW8fyjN5NMFhyfPXNUjqjslieiuKKM0fqaAx1MZP_G_Q2miUCVjRN2eUar8e17AGmtnXWKe3ZWs4FRfh7smE4OH1BlN7WGucSgGK7Gp66OHb_1MHXMFM20mTwXvLY2TeLrHB75GS07j0j5J7De_jxqd5Bq5T3b5PZnsTUSIVTC6Co0afm_gCqShlP8fcrvcntUyy3h7r2EfUo-i_VhVLllJUJm8sVWHwysU070DnMXI3ZdQ9J28G-04B_ylrEUZGOw1-o4wmRX1l9_F0Q1vjraSP7v9j0YptXFGJAHvGcRhFoXF1SWpDGCIQyoo0ZeXre1ZPNQ0JJ3_SHj1Vccv7nWi_gqmK46G-Y8s2VnBQw3BE3DbdasaVXtxFD-KuCpg-sWVHEIQkISGU1mPVyJio53oaco-UD-jCT0x4flPGv53R7CycEelbqVG3d0cVXMeJpeBcxrlhPa-NT_bB66qSM5_7V0xecxdH0PqeGu8dy0Edv-7Fb_3JPpCTSzKz5Eq1ZR-0c_u388SaaN1o1D02zB0Nc1B0RphjEypimGLgNZwnSAtWnkRuWKwjofoSo0KozadDlZZMP78ufsE2GQICf1xVuupDw0L2ONn02WCqM7UoN4USHttP6XUs98suGz3eCi2QwYUTjxnAIJG2awTIXI8UKTqatsulrIPnh4MnYNIFVjZa725HiY4y5vxVdcCwZ7EEPvum4M96fhFD20o3hXYLl-203d5i0RIFlp5TfZKnuxwbaz1c_lY5_PGE6HHzA3h02KaQzraNHZIP20pCLWToY3N8lCdNgIkEJUYS8GdPqV_oDA8u9A5cfNEDkxQPduUBmRdwWZutP_zL7D6vERznVtRbokKrprAQiDB0shqumtfFlHoQczDu4PVNFM0PLHyIVnL5H2MvYmo86tEIYXLWtdE28qsc9LuzFLgIJD2fazHs43bX1Sn7EuDzaomDi9FVHQdaSx-xqt1dtZt-odFOoTHKwWWBFrzxxvTluGAUwDu8aGCzjqX4Yb3U9mJHUxdWugh1jsSmJNQZzGGxW2DALYLqyXnoDfCO2Ot7BqMOrJmxi7bFEjq4yroVhZBX3NP_xLVlS9I2qHGvcC5eE3jIP9c8yk0i_uPqkHh7LB3SVwWcIMPXkk2NBLL8bkPVgZoBMvE8aQHWLY-33Xba8egVSHq8MLU5wwr0AXymOY1gVPCNaWhgspDk1lJ7PmZbEsn_2UOht7YATWZ13n9d9V8kAPlOhq6JcZSockWc40saITQlWis-3EvXuRXXSnmthTsn82D9bkGAKmWMbwVWDDV0IGbtUnuuMTLZDxQ7tCB5jqh4U4CjVegjaSNNGsAMaPF0EszxWo7cHPb5kiHsjDld8GjwX73Vci0j-hKxexfxjBZ9TqntTOx82YQOYpqX4rI8fL0fnlUSwLAOLeh4gGOus30tdt-3P3ZjdDREwUVFUsd1Vm40)
+
 </details>
 
-| Вариант | Плюсы | Минусы | Почему отклонен |
-|---|---|---|---|
-| Выделенная Центральная платформа | Изолирует новый домен, API и данные от текущей IoT-платформы; поддерживает развитие в SaaS. | Дублирует часть возможностей Существующего IoT-шлюза и TimescaleDB; требует новых операционных затрат. | Не отклонён; выбран как основной вариант. |
-| Расширение Существующего IoT-шлюза и TimescaleDB | Повторно использует существующие центральные возможности и может сократить объём первоначальной разработки. | Требует проверки пригодности, изоляции данных, правил доступа, хранения и влияния изменений на текущих пользователей. | Данные не подтверждают, что системы поддерживают API синхронизации ферм, нужную изоляцию и правила доступа без риска для текущей эксплуатации. |
+[Исходный код альтернативной C2-диаграммы](02-02-alternative.c4.container.puml)
+
+| Вариант                                          | Плюсы                                                                                                       | Минусы                                                                                                                | Почему отклонен                                                                                                                                          |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Выделенная Центральная платформа                 | Изолирует новый домен, API и данные от текущей IoT-платформы; поддерживает развитие в SaaS.                 | Дублирует часть возможностей Существующего IoT-шлюза и TimescaleDB; требует новых операционных затрат.                | Не отклонён; выбран как основной вариант.                                                                                                                |
+| Расширение Существующего IoT-шлюза и TimescaleDB | Повторно использует существующие центральные возможности и может сократить объём первоначальной разработки. | Требует проверки пригодности, изоляции данных, правил доступа, хранения и влияния изменений на текущих пользователей. | Данные не подтверждают, что системы поддерживают Центральный сервис синхронизации, нужную изоляцию и правила доступа без риска для текущей эксплуатации. |
 
 Повторное использование офисного Существующего S3-озера данных отклонено отдельно. Оно недоступно Агенту фермы при отсутствии интернет-соединения, не обеспечивает ферма-локальное хранение свидетельств, а его пригодность для изоляции клиентов, разграничения доступа, хранения и будущей SaaS-модели не подтверждена. Такое повторное использование связало бы MVP с владением и эксплуатационными ограничениями существующей платформы. Поэтому оба варианта используют новое Локальное S3 (MinIO), а Центральное S3 (MinIO) сохраняется и в альтернативном варианте.
 
@@ -122,13 +124,13 @@ Task 2 требует сравнить два варианта контейне�
 ### 5. Риски
 
 1. **Существующий IoT-шлюз или TimescaleDB несовместимы с альтернативой.**  
-   *Меры:* проверить API синхронизации ферм, схему данных, изоляцию, правила доступа, хранение и влияние изменений на текущих пользователей.
+   _Меры:_ проверить Центральный сервис синхронизации, его интерфейс и транспорт, схему данных, изоляцию, правила доступа, хранение и влияние изменений на текущих пользователей.
 
 2. **Потеря интернет-соединения приводит к потере данных или задержке синхронизации.**  
-   *Меры:* использовать Локальный буфер, Локальное хранилище и Локальное S3; синхронизировать данные после восстановления связи.
+   _Меры:_ использовать Локальный буфер, Локальное хранилище и Локальное S3; синхронизировать данные после восстановления связи.
 
 3. **Корпоративная интеграция нарушает локальные реакции.**  
-   *Меры:* не использовать Kafka или Интернет для Локальных уведомлений, управления устройствами и автономной работы.
+   _Меры:_ не использовать Kafka или Интернет для Локальных уведомлений, управления устройствами и автономной работы.
 
 4. **Недостаточная изоляция данных в повторно используемых системах.**  
-   *Меры:* до выбора альтернативы подтвердить разделение данных ферм, доступ по ролям и правила хранения; при отсутствии подтверждения использовать основной вариант.
+   _Меры:_ до выбора альтернативы подтвердить разделение данных ферм, доступ по ролям и правила хранения; при отсутствии подтверждения использовать основной вариант.

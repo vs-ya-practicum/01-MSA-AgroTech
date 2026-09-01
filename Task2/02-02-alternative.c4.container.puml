@@ -8,7 +8,7 @@ SHOW_PERSON_OUTLINE()
 Person(operator, "Оператор", "Контролирует несколько ферм, анализирует События фермы и координирует действия")
 Person(farmDutyEmployee, "Дежурный сотрудник фермы", "Получает Локальные уведомления и реагирует на проблемы фермы")
 System_Ext(existingKafka, "Существующий Kafka", "Центральный брокер для асинхронной корпоративной интеграции")
-System_Ext(existingIotGateway, "Существующий IoT-шлюз", "Внешний центральный шлюз, расширенный API синхронизации ферм")
+System_Ext(existingIotGateway, "Существующий IoT-шлюз", "Внешний центральный шлюз, расширенный Центральным сервисом синхронизации")
 System_Ext(timescaleDb, "TimescaleDB", "Внешняя база данных, расширенная данными и схемой свиноводческих ферм")
 
 System_Boundary(centralPlatformBoundary, "Граница Центральной платформы") {
@@ -26,7 +26,7 @@ System_Boundary(farmBoundary, "Граница фермы") {
 Rel(operator, centralPlatform, "Использует", "HTTPS")
 Rel(farmDutyEmployee, farmAgent, "Получает Локальные уведомления")
 Rel(farmDevices, farmAgent, "Передают телеметрию и видеопотоки; получают команды управления", "Протоколы производителей")
-Rel(farmAgent, existingIotGateway, "Синхронизирует локально сохранённые данные после восстановления связи", "HTTPS/JSON; не более 10 минут при нормальном соединении")
+Rel(farmAgent, existingIotGateway, "Локальный сервис синхронизации передаёт локально сохранённые данные после восстановления связи", "Выбранный надёжный транспорт; не более 10 минут при нормальном соединении")
 Rel(existingIotGateway, timescaleDb, "Сохраняет синхронизированные данные ферм", "SQL")
 Rel(centralPlatform, existingIotGateway, "Получает синхронизированные данные ферм", "Внутренний API")
 Rel(centralPlatform, timescaleDb, "Читает данные для центральных операций и прогнозирования", "SQL")

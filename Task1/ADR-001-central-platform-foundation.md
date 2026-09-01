@@ -50,12 +50,12 @@ MVP-система свиноферм должна собирать данные
 ### Контекстная диаграмма
 
 > [!TIP]
-> Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>, чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
+> Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>. Откройте диаграмму в новой вкладке и переключите страницу в формат `Raw` чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
 
 <details>
 <summary>Диаграмма: MVP-система свиноферм — Основной вариант — System Context</summary>
 
-<a href="./svg/01-01-primary.c4.context.svg" target="_blank"><img src="./svg/01-01-primary.c4.context.svg" alt="MVP-система свиноферм — Основной вариант — System Context"></a>
+![MVP-система свиноферм — Основной вариант — System Context](./svg/01-01-primary.c4.context.svg)
 
 </details>
 
@@ -102,7 +102,7 @@ MVP-система свиноферм должна собирать данные
 ### Контекстная диаграмма
 
 > [!TIP]
-> Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>, чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
+> Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>. Откройте диаграмму в новой вкладке и переключите страницу в формат `Raw` чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
 
 <details>
 <summary>Диаграмма: MVP-система свиноферм — Альтернативный вариант — System Context</summary>

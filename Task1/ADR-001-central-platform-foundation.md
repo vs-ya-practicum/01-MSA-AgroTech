@@ -52,12 +52,7 @@ MVP-система свиноферм должна собирать данные
 > [!TIP]
 > Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>, чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
 
-<details>
-<summary>Диаграмма: MVP-система свиноферм — Основной вариант — System Context</summary>
-
-[Показать диаграмму](svg/01-01-primary.c4.context.svg)
-
-</details>
+![MVP-система свиноферм — Основной вариант — System Context](svg/01-01-primary.c4.context.svg)
 
 [Исходный код основной C1-диаграммы](01-01-primary.c4.context.puml)
 
@@ -104,12 +99,7 @@ MVP-система свиноферм должна собирать данные
 > [!TIP]
 > Установите в Chrome расширение <a href="https://chromewebstore.google.com/detail/svg-navigator/pefngfjmidahdaahgehodmfodhhhofkl" target="_blank">SVG Navigator</a>, чтобы просматривать диаграмму с масштабированием и панорамированием в отдельной вкладке.
 
-<details>
-<summary>Диаграмма: MVP-система свиноферм — Альтернативный вариант — System Context</summary>
-
-[Показать диаграмму](svg/01-02-alternative.c4.context.svg)
-
-</details>
+![MVP-система свиноферм — Альтернативный вариант — System Context](svg/01-02-alternative.c4.context.svg)
 
 [Исходный код альтернативной C1-диаграммы](01-02-alternative.c4.context.puml)
 

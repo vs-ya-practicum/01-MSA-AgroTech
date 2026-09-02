@@ -23,5 +23,7 @@
 - [Альтернативная компонентная C4-диаграмма задания 3](Task3/03-02-alternative.c4.component.puml) — Existing IoT Gateway и TimescaleDB в альтернативной реализации.
 - [Основная диаграмма кода задания 3](Task3/03-03-primary.c4.code.puml) — логические модули и зависимости основного варианта.
 - [Инкрементальная альтернативная диаграмма кода задания 3](Task3/03-04-alternative.c4.code.puml) — отличия альтернативы и соответствия основному варианту.
-- [ADR-003: асинхронная синхронизация](Task3/ADR-003-synchronization-transport.draft.md) — Dedicated Kafka, горячая история и архивирование.
-- [ADR-004: управление доступом](Task3/ADR-004-access-management.draft.md) — self-hosted ZITADEL OSS.
+
+## Task 4
+
+- [ADR задания 4: Критерии выбора решения](Task4/ADR-005-solution-selection.md) — критерии сравнения, анализ двух вариантов и рекомендованное решение.

@@ -8,7 +8,7 @@ note "2. Типы отношений:\n\nSupplier-Customer — поставщи�
 
 package "Граница фермы / Farm Boundary" {
   class "Мониторинг и обнаружение\nинцидентов на ферме\n(Livestock Monitoring and Incident Detection)" as monitoring
-  class "Управление устройствами\nи локальное реагирование\n(Device Operations and Local Response)" as devices
+  class "Управление устройствами\nи операционные задачи фермы\n(Device Operations and Farm Operations)" as devices
   class "Управление данными\nфермы\n(Farm Data Management)" as farmData
 }
 

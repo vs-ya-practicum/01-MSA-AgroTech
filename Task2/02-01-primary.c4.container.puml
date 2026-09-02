@@ -17,7 +17,6 @@ System_Boundary(syncInfrastructure, "Облачная инфраструктур
 
 System_Boundary(centralPlatformBoundary, "Граница Центральной платформы") {
     Container(centralPlatform, "Центральная платформа", "Прикладная платформа", "Принимает данные от Агентов фермы, предоставляет центральные операции, учёт кормов и прогнозирование, а также публикует Опубликованные метрики")
-    Container(archiverService, "Сервис архивирования", "Центральный сервис", "Архивирует холодные записи синхронизации")
     ContainerDb(centralDataStore, "Центральное хранилище данных", "PostgreSQL", "Доменные факты и текущее состояние ферм")
     ContainerDb(centralOperationsStore, "Центральное хранилище операций", "PostgreSQL", "Операторские представления, результаты анализа, состояние уведомлений и координации действий")
     ContainerDb(centralS3, "Центральное S3 (MinIO)", "Хранилище Артефактов данных", "Артефакты данных")
@@ -36,10 +35,8 @@ Rel(farmDevices, farmAgent, "Передают телеметрию и видео
 Rel(centralPlatform, centralDataStore, "Читает и записывает Доменные факты", "SQL")
 Rel(centralPlatform, centralOperationsStore, "Читает и записывает операционные данные", "SQL")
 Rel(centralPlatform, centralS3, "Сохраняет и читает Артефакты данных", "S3 API")
-Rel(farmAgent, dedicatedKafka, "Публикует локально сохранённые данные после восстановления связи", "Kafka; не более 10 минут при нормальном соединении")
-Rel(dedicatedKafka, centralPlatform, "Передаёт данные Центральному сервису синхронизации", "Kafka")
-Rel(dedicatedKafka, archiverService, "Передаёт холодные записи синхронизации", "Kafka")
-Rel(archiverService, existingS3DataLake, "Сохраняет архивные объекты", "S3 API")
+Rel(farmAgent, dedicatedKafka, "Локальный сервис синхронизации публикует локально сохранённые данные после восстановления связи", "Kafka; не более 10 минут при нормальном соединении")
+Rel(dedicatedKafka, centralPlatform, "Центральный сервис синхронизации принимает данные", "Kafka")
 Rel(farmAgent, localStorage, "Локальный буфер сохраняет и читает структурированные данные", "Локальная база данных")
 Rel(farmAgent, localS3, "Сохраняет и читает Артефакты данных", "S3 API")
 Rel(centralPlatform, existingKafka, "Публикует Опубликованные метрики", "Асинхронный Kafka")

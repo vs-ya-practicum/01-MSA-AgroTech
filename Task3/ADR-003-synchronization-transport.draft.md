@@ -32,10 +32,9 @@ Per farm, with batched telemetry:
 - Farm Events: 10–100 messages/day.
 - Feed facts: 24–96 messages/day.
 - Livestock-count facts: approximately 96 messages/day, assuming a 15-minute interval.
-- Configured metrics: according to their configured interval; an hourly metric produces 24 messages/day.
 - Raw telemetry: not retained centrally; only derived facts, current state, Farm Events, and selected evidence metadata are synchronized.
 
-Expected central synchronization volume is approximately 150–300 messages per farm per day, excluding video/audio.
+Expected central synchronization volume is approximately 130–290 messages per farm per day, excluding video/audio and Published Metrics.
 
 ## Message-size assumption
 

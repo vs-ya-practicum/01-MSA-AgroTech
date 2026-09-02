@@ -23,7 +23,7 @@ System_Boundary(syncInfrastructure, "Облачная инфраструктур
 
 System_Boundary(centralPlatformBoundary, "Граница Центральной платформы") {
     Container_Boundary(centralPlatform, "Центральная платформа") {
-        Component(zitadel, "ZITADEL OSS", "Self-hosted IAM", "Аутентификация и авторизация по ролям")
+        Component(zitadel, "AuthN/AuthZ", "ZITADEL OSS", "Аутентификация и авторизация по ролям")
         Component(centralWebApplication, "Центральное веб-приложение фермы", "", "Интерфейс для нескольких ферм")
         Component(feedInventoryForecast, "Запасы и прогноз корма", "", "Межферменный прогноз корма")
         Component(metricConfiguration, "Настройка метрик", "", "Настройка метрик")

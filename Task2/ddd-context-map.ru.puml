@@ -1,0 +1,34 @@
+@startuml MVP свиноферм - Карта контекстов DDD
+
+title MVP свиноферм - Карта контекстов DDD
+
+note "1. Канонические источники DDD-карт контекстов:\n\nEric Evans, Domain-Driven Design\nTackling Complexity in the Heart of Software,\nглава 14 «Maintaining Model Integrity».\n\nVaughn Vernon, Implementing Domain-Driven Design,\nглава 3 «Context Maps»." as dddReferences
+
+note "2. Типы отношений:\n\nSupplier-Customer — поставщик предоставляет\nвозможности или модель, а потребитель зависит от них.\nСтрелка показывает направление Supplier -> Customer.\n\nOpen Host Service — поставщик предоставляет публичный\nпротокол, который могут использовать другие\nограниченные контексты." as relationshipDefinitions
+
+package "Граница фермы / Farm Boundary" {
+  class "Мониторинг и обнаружение\nинцидентов на ферме\n(Livestock Monitoring and Incident Detection)" as monitoring
+  class "Управление устройствами\nи локальное реагирование\n(Device Operations and Local Response)" as devices
+  class "Управление данными\nфермы\n(Farm Data Management)" as farmData
+}
+
+package "Граница Центральной платформы / Central Platform Boundary" {
+  class "Управление данными\nЦентральной платформы\n(Central Platform Data Management)" as centralData
+  class "Центральные операции\n(Central Operations)" as operations
+  class "Управление доступом\n(Access Management)" as access
+  class "Запасы и прогноз корма\n(Feed Inventory and Forecast)" as feed
+  class "Публикация метрик\n(Metrics Publication)" as metrics
+}
+
+class "Синхронизация ферм\n(Farm Synchronization)" as sync
+
+monitoring --> farmData : Supplier-Customer
+devices --> farmData : Supplier-Customer
+farmData --> sync : Supplier-Customer
+sync --> centralData : Supplier-Customer
+centralData --> operations : Supplier-Customer
+centralData --> feed : Supplier-Customer
+centralData --> metrics : Supplier-Customer
+access ..> operations : Open Host Service
+
+@enduml

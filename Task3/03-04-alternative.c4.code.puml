@@ -12,13 +12,14 @@ package "Центральный сервис синхронизации" as sync
     class "Existing IoT Gateway Adapter" as iotGatewayAdapter <<adapter>>
     class "Synchronization Service" as synchronizationService <<primary dependency>>
     class "TimescaleDB Adapter" as timescaleAdapter <<adapter>>
-    class "Central Store Adapter" as centralStoreAdapter <<primary dependency>>
+    class "Central Data Store Adapter" as centralDataStoreAdapter <<primary dependency>>
 }
 
 package "Центральное веб-приложение фермы" as operationsPackage {
     class "Central Operations Service" as operationsService <<application service>>
     class "Central Operations Service" as primaryOperationsService <<primary dependency>>
     class "Metrics Data Adapter" as metricsDataAdapter <<adapter>>
+    class "Central Operations Store" as centralOperationsStore <<PostgreSQL database>>
     class "Metric Calculation Service" as primaryMetricCalculationService <<primary dependency>>
 }
 
@@ -54,7 +55,8 @@ dedicatedKafka --> archiverService : холодные записи
 archiverService --> existingS3DataLake : архивы
 
 iotGatewayAdapter ..> synchronizationService : замена
-timescaleAdapter ..> centralStoreAdapter : замена
+timescaleAdapter ..> centralDataStoreAdapter : замена
+operationsService --> centralOperationsStore : операционные данные
 operationsService ..> primaryOperationsService : без изменений
 feedDataAdapter ..> primaryFeedDataAdapter : источник данных
 metricsDataAdapter ..> primaryMetricCalculationService : источник данных

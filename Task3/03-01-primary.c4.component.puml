@@ -26,8 +26,9 @@ System_Boundary(centralPlatformBoundary, "Граница Центральной 
         Component(archiverService, "Сервис архивирования", "", "Архивирует записи")
     }
 
-    ContainerDb(centralStore, "Центральное хранилище", "База данных", "Данные ферм")
-    ContainerDb(centralS3, "Центральное S3 (MinIO)", "S3", "Свидетельства")
+    ContainerDb(centralDataStore, "Центральное хранилище данных", "PostgreSQL", "Доменные факты и текущее состояние ферм")
+    ContainerDb(centralOperationsStore, "Центральное хранилище операций", "PostgreSQL", "Операторские представления, результаты анализа, уведомления и координация действий")
+    ContainerDb(centralS3, "Центральное S3 (MinIO)", "S3", "Артефакты данных")
 }
 
 System_Boundary(farmBoundary, "Граница фермы") {
@@ -50,8 +51,9 @@ System_Boundary(farmBoundary, "Граница фермы") {
 Rel(operator, zitadel, "Входит в систему", "HTTPS")
 Rel(operator, centralWebApplication, "Использует", "HTTPS")
 Rel(centralWebApplication, zitadel, "Проверяет права доступа")
-Rel(centralWebApplication, centralStore, "Читает центральные операционные данные", "SQL")
-Rel(centralWebApplication, centralS3, "Читает центральные свидетельства", "S3 API")
+Rel(centralWebApplication, centralDataStore, "Читает Доменные факты", "SQL")
+Rel(centralWebApplication, centralOperationsStore, "Читает и записывает операционные данные", "SQL")
+Rel(centralWebApplication, centralS3, "Читает Артефакты данных", "S3 API")
 
 Rel(farmDevices, localDeviceGateway, "Передают телеметрию; получают команды управления", "Протоколы производителей")
 Rel(farmDevices, cameraIntegration, "Передают видеопотоки", "Протоколы производителей")
@@ -66,16 +68,16 @@ Rel(localDeviceGateway, localBuffer, "Передаёт телеметрию и �
 Rel(incidentDetection, localBuffer, "Передаёт События фермы")
 Rel(livestockCounting, localBuffer, "Передаёт данные о поголовье")
 Rel(localBuffer, localStorage, "Сохраняет структурированные данные", "Локальная база данных")
-Rel(localBuffer, localS3, "Сохраняет выбранные свидетельства", "S3 API")
+Rel(localBuffer, localS3, "Сохраняет выбранные Артефакты данных", "S3 API")
 Rel(localSynchronization, localStorage, "Читает данные и обновляет состояние доставки", "Локальная база данных")
-Rel(localSynchronization, localS3, "Читает подготовленные свидетельства", "S3 API")
+Rel(localSynchronization, localS3, "Читает подготовленные Артефакты данных", "S3 API")
 Rel(localSynchronization, dedicatedKafka, "Публикует локально сохранённые данные после восстановления связи", "Kafka; не более 10 минут")
 Rel(dedicatedKafka, centralSynchronization, "Передаёт данные Центральному сервису синхронизации", "Kafka")
 
-Rel(centralSynchronization, centralStore, "Сохраняет синхронизированную телеметрию и События фермы", "SQL")
-Rel(centralSynchronization, centralS3, "Сохраняет синхронизированные свидетельства", "S3 API")
-Rel(centralStore, feedInventoryForecast, "Предоставляет данные о корме")
-Rel(centralStore, metricsPublisher, "Предоставляет телеметрию и события")
+Rel(centralSynchronization, centralDataStore, "Сохраняет синхронизированные Доменные факты", "SQL")
+Rel(centralSynchronization, centralS3, "Сохраняет Артефакты данных", "S3 API")
+Rel(centralDataStore, feedInventoryForecast, "Предоставляет Доменные факты о корме")
+Rel(centralDataStore, metricsPublisher, "Предоставляет Доменные факты")
 Rel(metricConfiguration, metricsPublisher, "Передаёт конфигурацию метрик")
 Rel(metricsPublisher, existingKafka, "Публикует Опубликованные метрики", "Kafka")
 Rel(dedicatedKafka, archiverService, "Передаёт холодные записи синхронизации", "Kafka")

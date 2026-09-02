@@ -14,12 +14,12 @@ package "Центральный сервис синхронизации" as sync
         Проверяет, устраняет дубли и обрабатывает данные
     }
 
-    class "Central Store Adapter" as centralStoreAdapter <<adapter>> {
-        Сохраняет производные факты, текущее состояние и События фермы
+    class "Central Data Store Adapter" as centralDataStoreAdapter <<adapter>> {
+        Сохраняет Доменные факты и текущее состояние ферм
     }
 
     class "Central S3 Adapter" as centralS3Adapter <<adapter>> {
-        Сохраняет синхронизированные объекты свидетельств
+        Сохраняет Артефакты данных
     }
 }
 
@@ -37,7 +37,11 @@ package "Центральное веб-приложение фермы" as webAp
     }
 
     class "Central Platform API Adapter" as centralApiAdapter <<adapter>> {
-        Читает данные и свидетельства
+        Читает Доменные факты и Артефакты данных
+    }
+
+    class "Central Operations Store Adapter" as centralOperationsStoreAdapter <<adapter>> {
+        Читает и записывает операционные данные
     }
 }
 
@@ -184,8 +188,8 @@ package "Локальный буфер" as localBufferPackage {
         Сохраняет структурированные данные
     }
 
-    class "Evidence Storage Adapter" as evidenceStorageAdapter <<adapter>> {
-        Сохраняет объекты свидетельств
+    class "Local Data Artefact Storage Adapter" as localDataArtefactStorageAdapter <<adapter>> {
+        Сохраняет и читает Артефакты данных
     }
 }
 
@@ -205,7 +209,8 @@ package "Локальный сервис синхронизации" as localSyn
 }
 
 class "Dedicated Kafka" as dedicatedKafka <<queue>>
-class "Central Store" as centralStore <<database>>
+class "Central Data Store" as centralDataStore <<PostgreSQL database>>
+class "Central Operations Store" as centralOperationsStore <<PostgreSQL database>>
 class "Central S3 (MinIO)" as centralS3 <<database>>
 class "ZITADEL OSS" as zitadel <<external IAM>>
 class "Existing Kafka" as existingKafka <<external broker>>
@@ -216,29 +221,32 @@ class "Local S3 (MinIO)" as localS3 <<database>>
 
 dedicatedKafka --> kafkaAdapter : сообщения
 kafkaAdapter --> synchronizationService : данные синхронизации
-synchronizationService --> centralStoreAdapter : обработанные данные
-synchronizationService --> centralS3Adapter : данные свидетельств
-centralStoreAdapter --> centralStore : запись
+synchronizationService --> centralDataStoreAdapter : обработанные Доменные факты
+synchronizationService --> centralS3Adapter : Артефакты данных
+centralDataStoreAdapter --> centralDataStore : запись
 centralS3Adapter --> centralS3 : запись
 
 operatorWebUi --> centralOperationsService : действия Оператора
 centralOperationsService --> zitadelAdapter : проверка доступа
 centralOperationsService --> centralApiAdapter : запросы данных
+centralOperationsService --> centralOperationsStoreAdapter : операционные данные
 zitadelAdapter --> zitadel : OIDC
-centralApiAdapter --> centralStore : чтение
+centralApiAdapter --> centralDataStore : чтение Доменных фактов
+centralApiAdapter --> centralOperationsStore : чтение и запись операционных данных
+centralOperationsStoreAdapter --> centralOperationsStore : чтение и запись
 centralApiAdapter --> centralS3 : чтение
 
 feedForecastService --> feedDataAdapter : запрос данных
 feedForecastService --> forecastCalculator : расчёт прогноза
-feedDataAdapter --> centralStore : чтение данных о корме
+feedDataAdapter --> centralDataStore : чтение Доменных фактов о корме
 
 metricConfigurationService --> metricValidationService : проверка
 metricConfigurationService --> metricDefinitionRepository : сохранение
-metricDefinitionRepository --> centralStore : чтение и запись
+metricDefinitionRepository --> centralDataStore : чтение и запись
 
 metricsPublishingService --> metricCalculationService : расчёт
 metricsPublishingService --> kafkaMetricsAdapter : публикация
-metricCalculationService --> centralStore : чтение данных
+metricCalculationService --> centralDataStore : чтение Доменных фактов
 kafkaMetricsAdapter --> existingKafka : Kafka
 
 archiverService --> kafkaArchiveAdapter : архивирование
@@ -271,9 +279,9 @@ localNotificationService --> notificationDeliveryAdapter : уведомлени�
 farmEventPublisher --> bufferService : Событие фермы
 countingResultPublisher --> bufferService : результат подсчёта
 bufferService --> localDataAdapter : структурированные данные
-bufferService --> evidenceStorageAdapter : свидетельства
+        bufferService --> localDataArtefactStorageAdapter : Артефакты данных
 localDataAdapter --> localStorage : запись
-evidenceStorageAdapter --> localS3 : запись
+localDataArtefactStorageAdapter --> localS3 : запись и чтение
 
 localSynchronizationService --> deliveryStateRepository : состояние доставки
 localSynchronizationService --> localKafkaSynchronizationAdapter : публикация

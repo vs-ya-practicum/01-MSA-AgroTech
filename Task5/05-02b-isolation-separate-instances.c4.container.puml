@@ -3,34 +3,50 @@
 
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
+AddElementTag("delta", $bgColor="#000", $fontColor="#ADD8E6")
+
 SHOW_PERSON_OUTLINE()
 
 title SaaS-платформа — изоляция на уровне отдельных инстансов — Container
 
-Person(tenantAdministrator, "Администратор тенанта", "Управляет тенантом, пользователями, подпиской и интеграциями")
-Person(tenantOperator, "Оператор тенанта", "Контролирует данные ферм")
-Person(saasProviderOperationsStaff, "Операционный персонал провайдера SaaS", "Контролирует состояние тенантов и платформенных сервисов")
+Person(tenantAdministrator, "Администратор тенанта", "Управляет тенантом")
+Person(tenantOperator, "Оператор тенанта", "Контролирует фермы")
+Person(saasProviderOperationsStaff, "Операционный персонал провайдера SaaS", "Контролирует платформу")
+Person(farmDutyEmployee, "Дежурный сотрудник фермы", "Получает уведомления и выполняет действия")
 
-System_Ext(russianPaymentSystem, "Российская платёжная система", "Обрабатывает платежи")
-System_Ext(tenantInformationSystems, "Информационные системы тенанта", "Интегрируются через API тенанта")
-System_Ext(identityProvider, "Провайдер идентификации", "Аутентифицирует пользователей")
+System_Ext(russianPaymentSystem, "Российская платёжная система", "Платежи")
+System_Ext(tenantInformationSystems, "Информационные системы тенанта", "Интеграция через API тенанта")
+System_Ext(identityProvider, "Провайдер идентификации", "Аутентификация пользователей")
+System_Ext(farmDevices, "Устройства и камеры фермы", "Телеметрия, видео и команды")
 
 System_Boundary(saasPlatform, "SaaS-платформа") {
-    Container(tenantInstanceRouter, "Маршрутизация к инстансу тенанта", "Application service", "Направляет запрос к выделенному инстансу тенанта")
-    Container(tenantProvisioning, "Провижининг тенанта", "Application service", "Создаёт и активирует выделенный инстанс тенанта")
+    Container(tenantInstanceRouter, "Маршрутизация к инстансу тенанта", "Application service", "Направляет запрос к выделенному инстансу тенанта", $tags="delta")
+    Container(tenantProvisioning, "Провижининг тенанта", "Application service", "Создаёт и активирует выделенный инстанс тенанта", $tags="delta")
 }
 
 System_Boundary(tenantCentralPlatform, "Центральная платформа (тенанта)") {
-    System_Boundary(tenantAInstance, "Инстанс Тенанта A") {
-        Container(tenantAPlatform, "Центральная платформа Тенанта A", "Application instance", "Управляет структурами ферм Тенанта A")
-        ContainerDb(tenantADatabase, "База данных Тенанта A", "Database", "Хранит данные только Тенанта A")
-    }
+    Container_Boundary(instanceIsolation, "Изоляция на уровне отдельных инстансов") {
+        System_Boundary(tenantAInstance, "Инстанс Тенанта A") {
+            Container_Boundary(centralPlatformContextA, "Контекст Центральной платформы") {
+                Container(tenantAPlatform, "Центральная платформа Тенанта A", "Application instance", "Управляет структурами ферм Тенанта A", $tags="delta")
+                ContainerDb(tenantADatabase, "База данных Тенанта A", "Database", "Данные только Тенанта A", $tags="delta")
+            }
+        }
 
-    System_Boundary(tenantBInstance, "Инстанс Тенанта B") {
-        Container(tenantBPlatform, "Центральная платформа Тенанта B", "Application instance", "Управляет структурами ферм Тенанта B")
-        ContainerDb(tenantBDatabase, "База данных Тенанта B", "Database", "Хранит данные только Тенанта B")
+        System_Boundary(tenantBInstance, "Инстанс Тенанта B") {
+            Container_Boundary(centralPlatformContextB, "Контекст Центральной платформы") {
+                Container(tenantBPlatform, "Центральная платформа Тенанта B", "Application instance", "Управляет структурами ферм Тенанта B", $tags="delta")
+                ContainerDb(tenantBDatabase, "База данных Тенанта B", "Database", "Данные только Тенанта B", $tags="delta")
+            }
+        }
     }
 }
+
+note right of instanceIsolation
+  Вариант изоляции данных:
+  отдельный инстанс для каждого тенанта.
+  Голубой фон: изменённые или добавленные контейнеры.
+end note
 
 note right of saasPlatform
   Delta-диаграмма.
@@ -47,8 +63,10 @@ end note
 Rel(tenantAdministrator, tenantProvisioning, "Запускает онбординг тенанта")
 Rel(tenantOperator, tenantAPlatform, "Контролирует данные ферм Тенанта A")
 Rel(saasProviderOperationsStaff, tenantProvisioning, "Контролирует провижининг тенантов")
+Rel(farmDutyEmployee, tenantAPlatform, "Получает уведомления и выполняет действия")
 Rel(tenantInformationSystems, tenantInstanceRouter, "Передают запросы через API тенанта")
 Rel(identityProvider, tenantInstanceRouter, "Передаёт утверждения об идентичности и тенанте")
+Rel(farmDevices, tenantAPlatform, "Передают данные и получают команды")
 Rel(tenantInstanceRouter, tenantAPlatform, "Направляет запросы Тенанта A")
 Rel(tenantInstanceRouter, tenantBPlatform, "Направляет запросы Тенанта B")
 Rel(tenantProvisioning, tenantAPlatform, "Создаёт инстанс Тенанта A")

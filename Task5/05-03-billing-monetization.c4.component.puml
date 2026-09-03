@@ -34,7 +34,7 @@ Container_Boundary(paymentIntegration, "Интеграция с платёжно
 }
 }
 
-note right of billingMonetizationContext
+note bottom of billingMonetizationContext
   Delta-диаграмма.
   Диаграмма декомпозирует только bounded context
   Billing and Monetization.

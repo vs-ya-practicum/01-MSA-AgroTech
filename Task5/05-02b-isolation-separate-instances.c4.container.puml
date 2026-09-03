@@ -1,0 +1,59 @@
+@startuml SaaS-платформа — изоляция на уровне отдельных инстансов — Container
+!NEW_C4_STYLE=1
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+SHOW_PERSON_OUTLINE()
+
+title SaaS-платформа — изоляция на уровне отдельных инстансов — Container
+
+Person(tenantAdministrator, "Администратор тенанта", "Управляет тенантом, пользователями, подпиской и интеграциями")
+Person(tenantOperator, "Оператор тенанта", "Контролирует данные ферм")
+Person(saasProviderOperationsStaff, "Операционный персонал провайдера SaaS", "Контролирует состояние тенантов и платформенных сервисов")
+
+System_Ext(russianPaymentSystem, "Российская платёжная система", "Обрабатывает платежи")
+System_Ext(tenantInformationSystems, "Информационные системы тенанта", "Интегрируются через API тенанта")
+System_Ext(identityProvider, "Провайдер идентификации", "Аутентифицирует пользователей")
+
+System_Boundary(saasPlatform, "SaaS-платформа") {
+    Container(tenantInstanceRouter, "Маршрутизация к инстансу тенанта", "Application service", "Направляет запрос к выделенному инстансу тенанта")
+    Container(tenantProvisioning, "Провижининг тенанта", "Application service", "Создаёт и активирует выделенный инстанс тенанта")
+}
+
+System_Boundary(tenantCentralPlatform, "Центральная платформа (тенанта)") {
+    System_Boundary(tenantAInstance, "Инстанс Тенанта A") {
+        Container(tenantAPlatform, "Центральная платформа Тенанта A", "Application instance", "Управляет структурами ферм Тенанта A")
+        ContainerDb(tenantADatabase, "База данных Тенанта A", "Database", "Хранит данные только Тенанта A")
+    }
+
+    System_Boundary(tenantBInstance, "Инстанс Тенанта B") {
+        Container(tenantBPlatform, "Центральная платформа Тенанта B", "Application instance", "Управляет структурами ферм Тенанта B")
+        ContainerDb(tenantBDatabase, "База данных Тенанта B", "Database", "Хранит данные только Тенанта B")
+    }
+}
+
+note right of saasPlatform
+  Delta-диаграмма.
+  Неизменённая часть SaaS-платформы показана
+  на диаграмме 05-02a-isolation-separate-database.
+end note
+
+note right of tenantCentralPlatform
+  Delta-диаграмма.
+  Этот вариант заменяет общую Центральную платформу
+  отдельным инстансом для каждого тенанта.
+end note
+
+Rel(tenantAdministrator, tenantProvisioning, "Запускает онбординг тенанта")
+Rel(tenantOperator, tenantAPlatform, "Контролирует данные ферм Тенанта A")
+Rel(saasProviderOperationsStaff, tenantProvisioning, "Контролирует провижининг тенантов")
+Rel(tenantInformationSystems, tenantInstanceRouter, "Передают запросы через API тенанта")
+Rel(identityProvider, tenantInstanceRouter, "Передаёт утверждения об идентичности и тенанте")
+Rel(tenantInstanceRouter, tenantAPlatform, "Направляет запросы Тенанта A")
+Rel(tenantInstanceRouter, tenantBPlatform, "Направляет запросы Тенанта B")
+Rel(tenantProvisioning, tenantAPlatform, "Создаёт инстанс Тенанта A")
+Rel(tenantProvisioning, tenantBPlatform, "Создаёт инстанс Тенанта B")
+Rel(tenantAPlatform, tenantADatabase, "Хранит и получает данные Тенанта A")
+Rel(tenantBPlatform, tenantBDatabase, "Хранит и получает данные Тенанта B")
+
+@enduml

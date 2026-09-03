@@ -1,0 +1,87 @@
+@startuml SaaS-платформа — изоляция на уровне отдельных БД — Container
+!NEW_C4_STYLE=1
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+SHOW_PERSON_OUTLINE()
+
+title SaaS-платформа — изоляция на уровне отдельных БД — Container
+
+Person(tenantAdministrator, "Администратор тенанта", "Управляет тенантом, пользователями, подпиской и интеграциями")
+Person(tenantOperator, "Оператор тенанта", "Контролирует данные ферм")
+Person(saasProviderOperationsStaff, "Операционный персонал провайдера SaaS", "Контролирует состояние тенантов и платформенных сервисов")
+
+System_Ext(russianPaymentSystem, "Российская платёжная система", "Обрабатывает платежи")
+System_Ext(tenantInformationSystems, "Информационные системы тенанта", "Интегрируются через API тенанта")
+System_Ext(identityProvider, "Провайдер идентификации", "Аутентифицирует пользователей")
+
+System_Boundary(saasPlatform, "SaaS-платформа") {
+
+    Container(selfServicePanel, "Панель самообслуживания", "Web application", "Управляет аккаунтом, пользователями, подпиской и интеграциями")
+
+    Container(tenantApi, "API тенанта", "API", "Предоставляет разрешённые данные и функции SaaS-платформы")
+
+    Container(tenantManagement, "Управление тенантами", "Application service", "Регистрирует тенанты, управляет их жизненным циклом и изоляцией")
+
+    Container_Boundary(billingMonetization, "Billing and Monetization") {
+    Container(subscriptionService, "Тарификация и подписки", "Application service", "Управляет тарифами, лимитами и подписками")
+
+    Container(billingService, "Биллинг", "Application service", "Рассчитывает оплату и формирует данные для биллинга")
+
+    Container(usageMetrics, "Метрики использования", "Application service", "Собирает метрики тенанта для аналитики и биллинга")
+
+    Container(paymentIntegration, "Интеграция с платёжной системой", "Adapter", "Обменивается данными с российской платёжной системой")
+
+    ContainerDb(billingMonetizationDatabase, "База данных Billing and Monetization", "Database", "Хранит тарифы, подписки, Права доступа, Метрики использования, начисления, счета и статусы платежей")
+    }
+
+    Container(onboardingDocumentation, "Документация для интеграции", "Documentation portal", "Предоставляет документацию и API для самостоятельной интеграции")
+
+    ContainerDb(controlPlaneDatabase, "База данных Плоскости управления SaaS", "Database", "Хранит данные тенантов, их жизненного цикла и интеграций")
+}
+
+System_Boundary(tenantCentralPlatform, "Центральная платформа (тенанта)") {
+    Container(tenantCentralPlatformApp, "Центральная платформа (тенанта)", "Application", "Управляет структурами ферм")
+    Container(tenantDataAccess, "Доступ к данным тенанта", "Application service", "Определяет базу данных по контексту тенанта")
+
+    ContainerDb(tenantADatabase, "База данных Тенанта A", "Database", "Хранит данные только Тенанта A")
+
+    ContainerDb(tenantBDatabase, "База данных Тенанта B", "Database", "Хранит данные только Тенанта B")
+}
+
+note bottom of tenantCentralPlatform
+  Вариант изоляции данных:
+  отдельная база данных для каждого тенанта.
+end note
+
+Rel(tenantAdministrator, selfServicePanel, "Управляет аккаунтом")
+Rel(tenantOperator, tenantCentralPlatformApp, "Контролирует данные ферм")
+Rel(saasProviderOperationsStaff, tenantManagement, "Контролирует тенанты и платформенные сервисы")
+
+Rel(selfServicePanel, tenantManagement, "Управляет тенантом")
+Rel(selfServicePanel, subscriptionService, "Управляет подпиской")
+Rel(selfServicePanel, tenantApi, "Управляет интеграциями")
+
+Rel(tenantCentralPlatformApp, tenantApi, "Запрашивает аутентификацию и авторизацию")
+Rel(tenantInformationSystems, tenantApi, "Интегрируются через API тенанта")
+Rel(identityProvider, tenantApi, "Передаёт утверждения об идентичности и тенанте")
+
+Rel(tenantApi, tenantDataAccess, "Передаёт запрос с контекстом тенанта")
+Rel(tenantManagement, tenantDataAccess, "Проверяет изоляцию тенанта")
+Rel(tenantManagement, controlPlaneDatabase, "Хранит данные жизненного цикла тенанта")
+Rel(subscriptionService, billingMonetizationDatabase, "Хранит тарифы и подписки")
+Rel(billingService, billingMonetizationDatabase, "Хранит начисления и счета")
+Rel(usageMetrics, billingMonetizationDatabase, "Хранит Метрики использования")
+
+Rel(tenantDataAccess, tenantADatabase, "Обращается только при контексте Тенанта A")
+Rel(tenantDataAccess, tenantBDatabase, "Обращается только при контексте Тенанта B")
+
+Rel(subscriptionService, billingService, "Передаёт тариф и условия подписки")
+Rel(usageMetrics, billingService, "Передаёт метрики использования")
+Rel(billingService, paymentIntegration, "Передаёт данные для оплаты")
+Rel(paymentIntegration, russianPaymentSystem, "Обрабатывает платежи")
+
+Rel(tenantAdministrator, onboardingDocumentation, "Изучает документацию интеграции")
+
+@enduml

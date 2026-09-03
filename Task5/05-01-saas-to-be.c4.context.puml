@@ -1,0 +1,40 @@
+@startuml SaaS-платформа — To-Be — System Context
+!NEW_C4_STYLE=1
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+SHOW_PERSON_OUTLINE()
+
+title SaaS-платформа — To-Be — System Context
+
+Person(tenantAdministrator, "Администратор тенанта", "Управляет тенантом")
+Person(tenantOperator, "Оператор тенанта", "Контролирует данные ферм")
+Person(saasProviderOperationsStaff, "Операционный персонал провайдера SaaS", "Контролирует состояние тенантов")
+Person(farmDutyEmployee, "Дежурный сотрудник фермы", "Получает Локальные уведомления; выполняет Действия на ферме")
+
+System(tenantCentralPlatform, "Центральная платформа (тенанта)", "Управляет структурами ферм")
+
+System_Ext(saasPlatform, "SaaS-платформа", "Мультитенантная облачная платформа")
+System_Ext(russianPaymentSystem, "Российская платёжная система", "Обрабатывает платежи")
+System_Ext(tenantInformationSystems, "Информационные системы тенанта", "Интегрируются через API тенанта")
+System_Ext(identityProvider, "Провайдер идентификации", "Аутентифицирует пользователей")
+System_Ext(farmDevicesAndCameras, "Устройства и камеры фермы", "Кормушки, поилки, системы фильтрации воды и камеры на фермах")
+System_Ext(dedicatedKafka, "Выделенный Kafka", "Облачная очередь асинхронной синхронизации ферм")
+
+Rel(tenantAdministrator, saasPlatform, "Управляет тенантом, его пользователями, подпиской и интеграциями")
+Rel(tenantOperator, tenantCentralPlatform, "Контролирует данные ферм и координирует Операционные задачи фермы")
+Rel(saasProviderOperationsStaff, saasPlatform, "Контролирует состояние тенантов и платформенных сервисов")
+Rel(tenantCentralPlatform, saasPlatform, "Запрашивает у SaaS-платформы аутентификацию и авторизацию пользователя")
+Rel(saasPlatform, tenantCentralPlatform, "Передаёт результат проверки Права доступа до предоставления доступа к функциям Центральной платформы (тенанта)")
+Rel(russianPaymentSystem, saasPlatform, "Обрабатывает платежи за подписки SaaS-платформы")
+Rel(tenantInformationSystems, saasPlatform, "Интегрируются с SaaS-платформой через API тенанта и соответствующий Контракт интеграции")
+Rel(identityProvider, saasPlatform, "Аутентифицирует пользователей и формирует их утверждения об идентичности и тенанте")
+Rel(farmDutyEmployee, tenantCentralPlatform, "Получает Локальные уведомления и выполняет Действия на ферме")
+BiRel(farmDevicesAndCameras, tenantCentralPlatform, "Передают телеметрию и видео; получают команды управления устройствами")
+Rel(tenantCentralPlatform, dedicatedKafka, "Синхронизирует данные ферм")
+
+note bottom of tenantCentralPlatform
+  Ubiquitous Language: [[saas-ubiquitous-language.ru.md]]
+end note
+
+@enduml

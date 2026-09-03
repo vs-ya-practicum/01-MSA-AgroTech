@@ -1,0 +1,60 @@
+@startuml SaaS-платформа — биллинг и монетизация — Component
+!NEW_C4_STYLE=1
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+SHOW_PERSON_OUTLINE()
+
+title SaaS-платформа — биллинг и монетизация — Component
+
+Person(tenantAdministrator, "Администратор тенанта", "Управляет подпиской и интеграциями")
+Container_Ext(selfServicePanel, "Панель самообслуживания", "Web application", "Управляет аккаунтом, пользователями, подпиской и интеграциями")
+System_Ext(russianPaymentSystem, "Российская платёжная система", "Обрабатывает платежи за подписки SaaS-платформы")
+
+System_Boundary(billingMonetizationContext, "Billing and Monetization") {
+Container_Boundary(subscriptionService, "Тарификация и подписки") {
+    Component(tariffCatalog, "Каталог тарифов", "Определяет тарифные планы и лимиты")
+    Component(subscriptionLifecycle, "Жизненный цикл подписки", "Управляет активацией, изменением, приостановкой и отменой подписки")
+    Component(entitlementCalculator, "Расчёт Прав доступа", "Определяет доступные тенанту функции и лимиты согласно тарифу и подписке")
+}
+
+Container_Boundary(billingService, "Биллинг") {
+    Component(chargeCalculation, "Расчёт начислений", "Рассчитывает сумму оплаты тенанта")
+    Component(invoiceManagement, "Управление счетами", "Создаёт и отслеживает счета")
+}
+
+Container_Boundary(usageMetrics, "Метрики использования") {
+    Component(usageCollection, "Сбор Метрик использования", "Регистрирует активность тенанта")
+    Component(usageAggregation, "Агрегация Метрик использования", "Формирует аналитические и биллинговые метрики")
+}
+
+Container_Boundary(paymentIntegration, "Интеграция с платёжной системой") {
+    Component(paymentProviderAdapter, "Адаптер Российской платёжной системы", "Передаёт платёжные данные и запросы")
+    Component(paymentResultHandler, "Обработчик результата платежа", "Обрабатывает результаты платежей и обратные вызовы")
+}
+}
+
+note right of billingMonetizationContext
+  Delta-диаграмма.
+  Диаграмма декомпозирует только bounded context
+  Billing and Monetization.
+  Остальные контейнеры SaaS-платформы показаны
+  на диаграмме 05-02a-isolation-separate-database.
+end note
+
+Rel(tenantAdministrator, selfServicePanel, "Управляет подпиской и интеграциями")
+Rel(selfServicePanel, subscriptionLifecycle, "Управляет подпиской")
+Rel(tariffCatalog, subscriptionLifecycle, "Предоставляет тарифы и лимиты")
+Rel(subscriptionLifecycle, entitlementCalculator, "Передаёт условия подписки")
+Rel(entitlementCalculator, chargeCalculation, "Передаёт Права доступа и лимиты")
+
+Rel(usageCollection, usageAggregation, "Передаёт Метрики использования")
+Rel(usageAggregation, chargeCalculation, "Передаёт агрегированные данные")
+Rel(subscriptionLifecycle, chargeCalculation, "Передаёт тариф и условия подписки")
+Rel(chargeCalculation, invoiceManagement, "Передаёт сумму начислений")
+Rel(invoiceManagement, paymentProviderAdapter, "Передаёт данные счёта для оплаты")
+Rel(paymentProviderAdapter, russianPaymentSystem, "Отправляет платёжные данные")
+Rel(russianPaymentSystem, paymentResultHandler, "Передаёт результат платежа и обратный вызов")
+Rel(paymentResultHandler, invoiceManagement, "Обновляет статус счёта")
+
+@enduml

@@ -102,16 +102,16 @@
 ## 4. Биллинг и монетизация
 
 > [!INFO]
-> C3-диаграмма является delta-диаграммой. Она декомпозирует только bounded context `Billing and Monetization`; остальные контейнеры SaaS-платформы показаны на первой C2-диаграмме.
+> C3-диаграмма является delta-диаграммой. Она декомпозирует bounded context `Billing and Monetization` и `Контекст Опубликованных метрик`; остальные контейнеры SaaS-платформы показаны на первой C2-диаграмме.
 
 <details>
-<summary>SaaS-платформа — биллинг и монетизация — Component</summary>
+<summary>SaaS-платформа — биллинг, монетизация и Опубликованные метрики — Component</summary>
 
-![SaaS-платформа — биллинг и монетизация — Component](svg/05-03-billing-monetization.c4.component.svg)
+![SaaS-платформа — биллинг, монетизация и Опубликованные метрики — Component](svg/05-03-billing-monetization.c4.component.svg)
 
 </details>
 
-[Исходный код delta C3-диаграммы Billing and Monetization](05-03-billing-monetization.c4.component.puml)
+[Исходный код delta C3-диаграммы Billing and Monetization и Опубликованных метрик](05-03-billing-monetization.c4.component.puml)
 
 ## 5. Рекомендованное решение
 

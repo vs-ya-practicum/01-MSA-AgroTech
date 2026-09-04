@@ -6,6 +6,8 @@
 
 SHOW_PERSON_OUTLINE()
 
+AddElementTag("delta", $bgColor="#000", $fontColor="#ADD8E6")
+
 title SaaS-платформа — изоляция на уровне отдельных БД — Container
 
 Person(tenantAdministrator, "Администратор тенанта", "Управляет тенантом")
@@ -59,15 +61,16 @@ System_Boundary(tenantCentralPlatform, "Центральная платформ�
 
     Container_Boundary(dataIsolation, "Изоляция на уровне отдельных баз данных") {
         Container(tenantDataAccess, "Доступ к данным тенанта", "Application service", "Выбирает БД по контексту тенанта")
-        ContainerDb(tenantADatabase, "База данных Тенанта A", "Database", "Данные только Тенанта A")
+        ContainerDb(tenantADatabase, "База данных Тенанта A", "Database", "Данные только Тенанта A", $tags="delta")
 
-        ContainerDb(tenantBDatabase, "База данных Тенанта B", "Database", "Данные только Тенанта B")
+        ContainerDb(tenantBDatabase, "База данных Тенанта B", "Database", "Данные только Тенанта B", $tags="delta")
     }
 }
 
 note bottom of dataIsolation
     Вариант изоляции данных:
     отдельная база данных для каждого тенанта.
+    Голубой фон: изменённые или добавленные контейнеры.
 end note
 
 Rel(tenantAdministrator, selfServicePanel, "Управляет аккаунтом")

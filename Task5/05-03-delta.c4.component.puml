@@ -45,27 +45,20 @@ System_Boundary(centralPlatformBoundary, "Центральная платфор�
     System_Boundary(publishedMetricsContext, "Контекст Опубликованных метрик") {
         Component(centralWebApplication, "Центральное веб-приложение фермы", "Web application", "Интерфейс Оператора")
         Component(metricConfiguration, "Настройка метрик", "Настраивает операционные метрики")
-        Component(metricsPublisher, "Публикатор метрик", "Публикует Опубликованные метрики")
-        Component(metricsAPI, "API метрик", "Предоставляет доступ Опубликованным метрикам")
-        ContainerDb(metricsDB, "Хранилище метрик")
+        Component(metricsPublisher, "Сервис Опубликованных метрик", "REST API", "Предоставляет доступ к Опубликованным метрикам")
+        ContainerDb(centralPlatformDatabase, "База данных Центральной платформы", "Database", "Хранит метрики и настройки метрик")
     }
-    note bottom of centralWebApplication
-        Must add a component Metrics Management
-        that communicated with the web app
-        manages all metric operations
-    end note
 }
 
 note bottom of billingMonetizationContext
-    Delta-диаграмма.
-    Диаграмма декомпозирует bounded context
-    Billing and Monetization и Контекст Опубликованных метрик.
-    Остальные контейнеры SaaS-платформы показаны
-    на диаграмме 05-02a-isolation-separate-database.
+    Инкрементальная диаграмма.
+    Диаграмма декомпозирует только контексты
+    Биллинг и монетизация и Опубликованные метрики,
+    чтобы не повторять контейнеры с базовой диаграммы
+    контейнеров 05-02a-isolation-separate-database.
 end note
 
-Rel_Back(metricsDB, metricConfiguration, "Чтение/Запись")
-Rel(customerInformationSystems, metricsAPI, "Использует", "HTTPS")
+Rel(customerInformationSystems, metricsPublisher, "Получает Опубликованные метрики", "HTTPS")
 Rel(tenantOperator, centralWebApplication, "Использует", "HTTPS")
 Rel(tenantAdministrator, selfServicePanel, "Управляет подпиской и интеграциями")
 Rel(selfServicePanel, subscriptionLifecycle, "Управляет подпиской")
@@ -82,6 +75,7 @@ Rel(paymentProviderAdapter, russianPaymentSystem, "Отправляет плат
 Rel(russianPaymentSystem, paymentResultHandler, "Передаёт результат платежа и обратный вызов")
 Rel(paymentResultHandler, invoiceManagement, "Обновляет статус счёта")
 Rel(centralWebApplication, metricConfiguration, "Настраивает метрики")
-Rel(metricConfiguration, metricsPublisher, "Передаёт конфигурацию метрик")
+Rel(metricConfiguration, centralPlatformDatabase, "Сохраняет настройки метрик")
+Rel(metricsPublisher, centralPlatformDatabase, "Сохраняет и читает Опубликованные метрики")
 
 @enduml

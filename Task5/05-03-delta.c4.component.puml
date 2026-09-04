@@ -1,0 +1,83 @@
+@startuml SaaS-платформа — биллинг, монетизация и Опубликованные метрики — Component
+!NEW_C4_STYLE=1
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+SHOW_PERSON_OUTLINE()
+
+title SaaS-платформа — биллинг, монетизация и Опубликованные метрики — Component
+
+Person(tenantOperator, "Оператор тенанта", "Контролирует данные ферм")
+Person(tenantAdministrator, "Администратор тенанта", "Управляет подпиской и интеграциями")
+System_Ext(customerInformationSystems, "Информационная система клиента", "Интеграция через API Центральной платформы")
+
+System_Ext(russianPaymentSystem, "Российская платёжная система", "Обрабатывает платежи за подписки SaaS-платформы")
+
+System_Boundary(saasPlatform, "SaaS-платформа") {
+    Container(selfServicePanel, "Панель самообслуживания", "Web application", "Управляет аккаунтом, пользователями, подпиской и интеграциями")
+
+    System_Boundary(billingMonetizationContext, "Billing and Monetization") {
+        Container_Boundary(subscriptionService, "Тарификация и подписки") {
+            Component(tariffCatalog, "Каталог тарифов", "Определяет тарифные планы и лимиты")
+            Component(subscriptionLifecycle, "Жизненный цикл подписки", "Управляет активацией, изменением, приостановкой и отменой подписки")
+            Component(entitlementCalculator, "Расчёт Прав доступа", "Определяет доступные тенанту функции и лимиты согласно тарифу и подписке")
+        }
+
+        Container_Boundary(billingService, "Биллинг") {
+            Component(chargeCalculation, "Расчёт начислений", "Рассчитывает сумму оплаты тенанта")
+            Component(invoiceManagement, "Управление счетами", "Создаёт и отслеживает счета")
+        }
+
+        Container_Boundary(usageMetrics, "Метрики использования") {
+            Component(usageCollection, "Сбор Метрик использования", "Регистрирует активность тенанта")
+            Component(usageAggregation, "Агрегация Метрик использования", "Формирует аналитические и биллинговые метрики")
+        }
+
+        Container_Boundary(paymentIntegration, "Интеграция с платёжной системой") {
+            Component(paymentProviderAdapter, "Адаптер Российской платёжной системы", "Передаёт платёжные данные и запросы")
+            Component(paymentResultHandler, "Обработчик результата платежа", "Обрабатывает результаты платежей и обратные вызовы")
+        }
+    }
+
+}
+
+System_Boundary(centralPlatformBoundary, "Центральная платформа") {
+    System_Boundary(publishedMetricsContext, "Контекст Опубликованных метрик") {
+        Component(centralWebApplication, "Центральное веб-приложение фермы", "Web application", "Интерфейс Оператора")
+        Component(metricConfiguration, "Настройка метрик", "Настраивает операционные метрики")
+        Component(metricsPublisher, "Сервис Опубликованных метрик", "REST API", "Предоставляет доступ к Опубликованным метрикам")
+        Component(developerPortal, "Developer Portal", "Stoplight Elements", "Отображает документацию API Опубликованных метрик")
+        ContainerDb(centralPlatformDatabase, "База данных Центральной платформы", "Database", "Хранит метрики и настройки метрик")
+    }
+}
+
+note bottom of billingMonetizationContext
+    Инкрементальная диаграмма.
+    Диаграмма декомпозирует только контексты
+    Биллинг и монетизация и Опубликованные метрики,
+    чтобы не повторять контейнеры с базовой диаграммы
+    контейнеров 05-02a-isolation-separate-database.
+end note
+
+Rel(customerInformationSystems, metricsPublisher, "Получает Опубликованные метрики", "HTTPS")
+Rel(customerInformationSystems, developerPortal, "Использует документацию API", "HTTPS")
+Rel(tenantOperator, centralWebApplication, "Использует", "HTTPS")
+Rel(tenantAdministrator, selfServicePanel, "Управляет подпиской и интеграциями")
+Rel(selfServicePanel, subscriptionLifecycle, "Управляет подпиской")
+Rel(tariffCatalog, subscriptionLifecycle, "Предоставляет тарифы и лимиты")
+Rel(subscriptionLifecycle, entitlementCalculator, "Передаёт условия подписки")
+Rel(entitlementCalculator, chargeCalculation, "Передаёт Права доступа и лимиты")
+
+Rel(usageCollection, usageAggregation, "Передаёт Метрики использования")
+Rel(usageAggregation, chargeCalculation, "Передаёт агрегированные данные")
+Rel(subscriptionLifecycle, chargeCalculation, "Передаёт тариф и условия подписки")
+Rel(chargeCalculation, invoiceManagement, "Передаёт сумму начислений")
+Rel(invoiceManagement, paymentProviderAdapter, "Передаёт данные счёта для оплаты")
+Rel(paymentProviderAdapter, russianPaymentSystem, "Отправляет платёжные данные")
+Rel(russianPaymentSystem, paymentResultHandler, "Передаёт результат платежа и обратный вызов")
+Rel(paymentResultHandler, invoiceManagement, "Обновляет статус счёта")
+Rel(centralWebApplication, metricConfiguration, "Настраивает метрики")
+Rel(metricConfiguration, centralPlatformDatabase, "Сохраняет настройки метрик")
+Rel(metricsPublisher, centralPlatformDatabase, "Сохраняет и читает Опубликованные метрики")
+
+@enduml

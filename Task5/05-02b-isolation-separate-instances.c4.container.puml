@@ -1,0 +1,75 @@
+@startuml SaaS-платформа — изоляция на уровне отдельных инстансов — Container
+!NEW_C4_STYLE=1
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+AddElementTag("delta", $bgColor="#000", $fontColor="#ADD8E6")
+
+SHOW_PERSON_OUTLINE()
+
+title SaaS-платформа — изоляция на уровне отдельных инстансов — Container
+
+Person(tenantAdministrator, "Администратор тенанта", "Управляет тенантом")
+Person(tenantOperator, "Оператор тенанта", "Контролирует фермы")
+Person(saasProviderOperationsStaff, "Операционный персонал провайдера SaaS", "Контролирует платформу")
+Person(farmDutyEmployee, "Дежурный сотрудник фермы", "Получает уведомления и выполняет действия")
+
+System_Ext(identityProvider, "Провайдер идентификации", "Аутентификация пользователей")
+System_Ext(farmDevices, "Устройства и камеры фермы", "Телеметрия, видео и команды")
+
+System_Boundary(saasPlatform, "SaaS-платформа") {
+    Container(tenantInstanceRouter, "Маршрутизация к инстансу тенанта", "Application service", "Направляет запрос к выделенному инстансу тенанта", $tags="delta")
+    Container(tenantProvisioning, "Провижининг тенанта", "Application service", "Создаёт и активирует выделенный инстанс тенанта", $tags="delta")
+}
+
+System_Boundary(tenantCentralPlatform, "Центральная платформа (тенанта)") {
+    Container_Boundary(instanceIsolation, "Изоляция на уровне отдельных инстансов") {
+        System_Boundary(tenantAInstance, "Инстанс Тенанта A") {
+            Container_Boundary(centralPlatformContextA, "Контекст Центральной платформы") {
+                Container(tenantAPlatform, "Центральная платформа Тенанта A", "Application instance", "Управляет структурами ферм Тенанта A", $tags="delta")
+                ContainerDb(tenantADatabase, "База данных Тенанта A", "Database", "Данные только Тенанта A", $tags="delta")
+            }
+        }
+
+        System_Boundary(tenantBInstance, "Инстанс Тенанта B") {
+            Container_Boundary(centralPlatformContextB, "Контекст Центральной платформы") {
+                Container(tenantBPlatform, "Центральная платформа Тенанта B", "Application instance", "Управляет структурами ферм Тенанта B", $tags="delta")
+                ContainerDb(tenantBDatabase, "База данных Тенанта B", "Database", "Данные только Тенанта B", $tags="delta")
+            }
+        }
+    }
+}
+
+note right of instanceIsolation
+    Вариант изоляции данных:
+    отдельный инстанс для каждого тенанта.
+    Голубой фон: изменённые или добавленные контейнеры.
+end note
+
+note right of saasPlatform
+    Инкрементальная диаграмма
+    на основе базовой диаграммы
+    05-02a-isolation-separate-database.
+    Показывает только измененные
+    или добавленные контейнеры.
+end note
+
+note right of tenantCentralPlatform
+    Этот вариант заменяет общую Центральную платформу
+    отдельным инстансом для каждого тенанта.
+end note
+
+Rel(tenantAdministrator, tenantProvisioning, "Запускает онбординг тенанта")
+Rel(tenantOperator, tenantAPlatform, "Контролирует данные ферм Тенанта A")
+Rel(saasProviderOperationsStaff, tenantProvisioning, "Контролирует провижининг тенантов")
+Rel(farmDutyEmployee, tenantAPlatform, "Получает уведомления и выполняет действия")
+Rel(identityProvider, tenantInstanceRouter, "Передаёт утверждения об идентичности и тенанте")
+Rel(farmDevices, tenantAPlatform, "Передают данные и получают команды")
+Rel(tenantInstanceRouter, tenantAPlatform, "Направляет запросы Тенанта A")
+Rel(tenantInstanceRouter, tenantBPlatform, "Направляет запросы Тенанта B")
+Rel(tenantProvisioning, tenantAPlatform, "Создаёт инстанс Тенанта A")
+Rel(tenantProvisioning, tenantBPlatform, "Создаёт инстанс Тенанта B")
+Rel(tenantAPlatform, tenantADatabase, "Хранит и получает данные Тенанта A")
+Rel(tenantBPlatform, tenantBDatabase, "Хранит и получает данные Тенанта B")
+
+@enduml

@@ -1,0 +1,108 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Published Metrics Tenant API",
+    "version": "0.1.0-draft",
+    "description": "API for a Client Information System to retrieve aggregated Published Metrics from the SaaS Platform. Farm-level data is not provided."
+  },
+  "servers": [
+    {
+      "url": "https://api.example.com",
+      "description": "SaaS Platform API"
+    }
+  ],
+  "paths": {
+    "/v1/published-metrics": {
+      "get": {
+        "operationId": "listPublishedMetrics",
+        "summary": "List aggregated Published Metrics",
+        "tags": ["Published Metrics"],
+        "parameters": [{ "$ref": "#/components/parameters/MetricId" }, { "$ref": "#/components/parameters/Page" }, { "$ref": "#/components/parameters/PageSize" }],
+        "responses": {
+          "200": {
+            "description": "Aggregated Published Metrics",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PublishedMetricCollection" } } }
+          }
+        }
+      }
+    },
+    "/v1/published-metrics/{metricId}": {
+      "get": {
+        "operationId": "getPublishedMetric",
+        "summary": "Get an aggregated Published Metric",
+        "tags": ["Published Metrics"],
+        "parameters": [{ "$ref": "#/components/parameters/MetricIdPath" }],
+        "responses": {
+          "200": {
+            "description": "Aggregated Published Metric",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PublishedMetric" } } }
+          }
+        }
+      }
+    },
+    "/v1/published-metrics/catalog": {
+      "get": {
+        "operationId": "getPublishedMetricCatalog",
+        "summary": "List available Published Metrics",
+        "tags": ["Published Metrics"],
+        "responses": {
+          "200": {
+            "description": "Published Metric catalog",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/MetricDefinition" } } } }
+          }
+        }
+      }
+    },
+    "/v1/published-metrics/availability": {
+      "get": {
+        "operationId": "getPublishedMetricAvailability",
+        "summary": "Get Published Metric availability",
+        "tags": ["Published Metrics"],
+        "responses": {
+          "200": {
+            "description": "Availability of Published Metrics",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/MetricAvailability" } } } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "MetricId": { "name": "metric_id", "in": "query", "schema": { "type": "string" }, "description": "Published Metric identifier." },
+      "MetricIdPath": { "name": "metricId", "in": "path", "required": true, "schema": { "type": "string" } },
+      "Page": { "name": "page", "in": "query", "schema": { "type": "integer", "minimum": 1, "default": 1 } },
+      "PageSize": { "name": "page_size", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } }
+    },
+    "schemas": {
+      "PublishedMetric": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["metric_id", "name", "value", "unit"],
+        "properties": { "metric_id": { "type": "string" }, "name": { "type": "string" }, "value": { "type": "number" }, "unit": { "type": "string" } }
+      },
+      "PublishedMetricCollection": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["items"],
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/PublishedMetric" } },
+          "page": { "type": "integer", "minimum": 1 },
+          "page_size": { "type": "integer", "minimum": 1 }
+        }
+      },
+      "MetricDefinition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["metric_id", "name", "unit"],
+        "properties": { "metric_id": { "type": "string" }, "name": { "type": "string" }, "unit": { "type": "string" }, "description": { "type": "string" } }
+      },
+      "MetricAvailability": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["metric_id", "available"],
+        "properties": { "metric_id": { "type": "string" }, "available": { "type": "boolean" } }
+      }
+    }
+  }
+}

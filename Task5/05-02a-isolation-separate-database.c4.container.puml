@@ -1,0 +1,113 @@
+@startuml SaaS-платформа — изоляция на уровне отдельных БД — Container
+!NEW_C4_STYLE=1
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+SHOW_PERSON_OUTLINE()
+
+AddElementTag("delta", $bgColor="#000", $fontColor="#ADD8E6")
+
+title SaaS-платформа — изоляция на уровне отдельных БД — Container
+
+Person(tenantAdministrator, "Администратор тенанта", "Управляет тенантом")
+Person(tenantOperator, "Оператор тенанта", "Контролирует фермы")
+Person(saasProviderOperationsStaff, "Операционный персонал провайдера SaaS", "Контролирует платформу")
+Person(farmDutyEmployee, "Дежурный сотрудник фермы", "Получает уведомления и выполняет действия")
+
+System_Ext(russianPaymentSystem, "Российская платёжная система", "Платежи")
+System_Ext(customerInformationSystems, "Информационная система клиента", "Интеграция через API Центральной платформы")
+System_Ext(identityProvider, "Провайдер идентификации", "Аутентификация пользователей")
+System_Ext(farmDevices, "Устройства и камеры фермы", "Телеметрия, видео и команды")
+
+System_Boundary(saasPlatform, "SaaS-платформа") {
+
+    Container(selfServicePanel, "Панель самообслуживания", "Web application", "Аккаунт, пользователи, подписка и интеграции")
+
+    Container(tenantApi, "API тенанта", "REST API", "Разрешённые данные и функции")
+
+    Container(tenantManagement, "Управление тенантами", "Application service", "Регистрация, жизненный цикл и изоляция")
+
+    Container_Boundary(billingMonetization, "Billing and Monetization") {
+        Container(subscriptionService, "Тарификация и подписки", "Application service", "Тарифы, лимиты и подписки")
+
+        Container(billingService, "Биллинг", "Application service", "Расчёт оплаты и биллинг")
+
+        Container(usageMetrics, "Метрики использования", "Application service", "Метрики тенанта для аналитики и биллинга")
+
+        Container(paymentIntegration, "Интеграция с платёжной системой", "Adapter", "Обмен платёжными данными")
+
+        ContainerDb(billingMonetizationDatabase, "База данных Billing and Monetization", "Database", "Хранит тарифы, подписки, Права доступа, Метрики использования, начисления, счета и статусы платежей")
+    }
+
+    ContainerDb(controlPlaneDatabase, "База данных Плоскости управления SaaS", "Database", "Тенанты, жизненный цикл и интеграции")
+}
+
+System_Boundary(tenantCentralPlatform, "Центральная платформа (тенанта)") {
+    ContainerQueue(dedicatedKafka, "Выделенный Kafka", "Kafka", "Очередь синхронизации")
+
+    Container_Boundary(centralPlatformContext, "Контекст Центральной платформы") {
+        Container(centralPlatform, "Центральная платформа", "Прикладная платформа", "Операции, корма, прогнозирование и метрики")
+        ContainerDb(centralDataStore, "Центральное хранилище данных", "PostgreSQL", "Доменные факты и состояние ферм")
+        ContainerDb(centralOperationsStore, "Центральное хранилище операций", "PostgreSQL", "Операторские данные и координация действий")
+        ContainerDb(centralS3, "Центральное S3 (MinIO)", "Хранилище Артефактов данных", "Артефакты данных")
+    }
+
+    Container_Boundary(farmAgentContext, "Контекст Агента фермы") {
+        Container(farmAgent, "Агент фермы", "Локальное программно-аппаратное решение", "Телеметрия, видео, управление устройствами, инциденты и синхронизация")
+        ContainerDb(localStorage, "Локальное хранилище", "Локальная база Доменного факта", "Доменные факты и синхронизация")
+        ContainerDb(localS3, "Локальное S3 (MinIO)", "Локальное хранилище Артефактов данных", "Артефакты данных")
+    }
+
+    Container_Boundary(dataIsolation, "Изоляция на уровне отдельных баз данных") {
+        Container(tenantDataAccess, "Доступ к данным тенанта", "Application service", "Выбирает БД по контексту тенанта")
+        ContainerDb(tenantADatabase, "База данных Тенанта A", "Database", "Данные только Тенанта A", $tags="delta")
+
+        ContainerDb(tenantBDatabase, "База данных Тенанта B", "Database", "Данные только Тенанта B", $tags="delta")
+    }
+}
+
+note bottom of dataIsolation
+    Вариант изоляции данных:
+    отдельная база данных для каждого тенанта.
+    Голубой фон: изменённые или добавленные контейнеры.
+end note
+
+Rel(tenantAdministrator, selfServicePanel, "Управляет аккаунтом")
+Rel(tenantOperator, centralPlatform, "Контролирует фермы")
+Rel(saasProviderOperationsStaff, tenantManagement, "Контролирует платформу")
+Rel(farmDutyEmployee, farmAgent, "Получает уведомления и выполняет действия")
+
+Rel(selfServicePanel, tenantManagement, "Управляет тенантом")
+Rel(selfServicePanel, subscriptionService, "Управляет подпиской")
+Rel(selfServicePanel, tenantApi, "Управляет интеграциями")
+
+Rel(centralPlatform, tenantApi, "Запрашивает доступ")
+Rel(customerInformationSystems, centralPlatform, "Интегрируются через API Опубликованных метрик")
+Rel(identityProvider, tenantApi, "Передаёт утверждения")
+
+Rel(tenantApi, tenantDataAccess, "Передаёт запрос")
+Rel(tenantManagement, tenantDataAccess, "Проверяет изоляцию")
+Rel(tenantManagement, controlPlaneDatabase, "Хранит данные тенанта")
+Rel(subscriptionService, billingMonetizationDatabase, "Хранит тарифы и подписки")
+Rel(billingService, billingMonetizationDatabase, "Хранит начисления и счета")
+Rel(usageMetrics, billingMonetizationDatabase, "Хранит метрики")
+
+Rel(tenantDataAccess, tenantADatabase, "Данные Тенанта A")
+Rel(tenantDataAccess, tenantBDatabase, "Данные Тенанта B")
+
+Rel(centralPlatform, centralDataStore, "Хранит Доменные факты")
+Rel(centralPlatform, centralOperationsStore, "Хранит операции")
+Rel(centralPlatform, centralS3, "Хранит Артефакты данных")
+Rel(farmDevices, farmAgent, "Передают данные и получают команды")
+Rel(farmAgent, dedicatedKafka, "Публикует данные после восстановления связи")
+Rel(dedicatedKafka, centralPlatform, "Передаёт данные")
+Rel(farmAgent, localStorage, "Хранит структурированные данные")
+Rel(farmAgent, localS3, "Хранит Артефакты данных")
+Rel(subscriptionService, billingService, "Передаёт тариф и условия подписки")
+Rel(usageMetrics, billingService, "Передаёт метрики использования")
+Rel(billingService, paymentIntegration, "Передаёт данные для оплаты")
+Rel(paymentIntegration, russianPaymentSystem, "Проводит платежи")
+
+
+@enduml

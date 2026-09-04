@@ -1,0 +1,86 @@
+@startuml MVP-система свиноферм — Альтернативный вариант — Component
+!NEW_C4_STYLE=1
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+title MVP-система свиноферм — Альтернативный вариант — Component
+
+AddExternalSystemTag("alternative", $bgColor="#000", $fontColor="#D3D3D3", $borderColor="#808080")
+
+LAYOUT_WITH_LEGEND()
+SHOW_PERSON_OUTLINE()
+
+Person(operator, "Оператор", "Контроль ферм")
+Person(farmDutyEmployee, "Дежурный сотрудник", "Реагирование на проблемы")
+System_Ext(existingKafka, "Существующий Kafka", "Корпоративные метрики")
+System_Ext(existingS3DataLake, "Существующее S3-озеро", "Архивные объекты")
+System_Boundary(existingIotPlatform, "Существующая IoT-платформа") {
+    System_Ext(existingIotGateway, "Существующий IoT-шлюз", "Синхронизация", "", "alternative")
+    System_Ext(timescaleDb, "TimescaleDB", "Центральные данные", "", "alternative")
+}
+System_Boundary(syncInfrastructure, "Облачная инфраструктура синхронизации") {
+    ContainerQueue(dedicatedKafka, "Выделенный Kafka", "Kafka", "Синхронизация; горячая история 30 дней")
+}
+
+System_Boundary(centralPlatformBoundary, "Граница Центральной платформы") {
+    Container_Boundary(centralPlatform, "Центральная платформа") {
+        Component(zitadel, "AuthN/AuthZ", "ZITADEL OSS", "Аутентификация и авторизация по ролям")
+        Component(centralWebApplication, "Центральное веб-приложение фермы", "", "Интерфейс для нескольких ферм")
+        Component(feedInventoryForecast, "Запасы и прогноз корма", "", "Межферменный прогноз корма")
+        Component(metricConfiguration, "Настройка метрик", "", "Настройка метрик")
+        Component(metricsPublisher, "Публикатор метрик", "", "Публикация метрик в Kafka")
+        Component(archiverService, "Сервис архивирования", "", "Архивирование записей в S3")
+    }
+    ContainerDb(centralOperationsStore, "Центральное хранилище операций", "PostgreSQL", "Операторские представления, результаты анализа, уведомления и координация действий")
+    Container(centralS3, "Центральное S3 (MinIO)", "Объектное хранилище", "Артефакты данных")
+}
+
+System_Boundary(farmBoundary, "Граница фермы") {
+    System_Ext(farmDevices, "Устройства и камеры фермы", "Устройства разных производителей")
+    Container_Boundary(farmAgent, "Агент фермы") {
+        Component(localDeviceGateway, "Локальный шлюз устройств", "", "Телеметрия и управление устройствами")
+        Component(cameraIntegration, "Интеграция с камерами", "", "Приём видеопотоков")
+        Component(videoAnalytics, "Видеоаналитика", "", "Анализ видеопотоков")
+        Component(incidentDetection, "Обнаружение инцидентов с животными", "", "Создание Событий фермы")
+        Component(livestockCounting, "Подсчёт поголовья", "", "Расчёт поголовья")
+        Component(localNotification, "Локальное уведомление", "", "Уведомление дежурного")
+        Component(localBuffer, "Локальный буфер", "", "Подготовка данных к синхронизации")
+        Component(localSynchronization, "Локальный сервис синхронизации", "", "Публикация и доставка данных")
+    }
+    ContainerDb(localStorage, "Локальное хранилище", "Локальная база данных", "Телеметрия, события, доставка")
+    ContainerDb(localS3, "Локальное S3 (MinIO)", "Объектное хранилище", "Артефакты данных")
+}
+
+Rel(operator, zitadel, "Входит", "HTTPS")
+Rel(operator, centralWebApplication, "Использует", "HTTPS")
+Rel(centralWebApplication, zitadel, "Проверяет права")
+Rel(centralWebApplication, timescaleDb, "Читает Доменные факты", "SQL")
+Rel(centralWebApplication, centralOperationsStore, "Читает и записывает операционные данные", "SQL")
+Rel(centralWebApplication, centralS3, "Читает Артефакты данных", "S3 API")
+
+Rel(farmDevices, localDeviceGateway, "Передают телеметрию; получают команды", "Протоколы производителей")
+Rel(farmDevices, cameraIntegration, "Передают видеопотоки", "Протоколы производителей")
+Rel(cameraIntegration, videoAnalytics, "Передаёт видеопотоки")
+Rel(videoAnalytics, incidentDetection, "Передаёт результаты анализа")
+Rel(videoAnalytics, livestockCounting, "Передаёт результаты анализа")
+Rel(incidentDetection, localNotification, "Передаёт инциденты")
+Rel(localDeviceGateway, localNotification, "Передаёт изменения состояния")
+Rel(localNotification, farmDutyEmployee, "Отправляет уведомления")
+
+Rel(localDeviceGateway, localBuffer, "Передаёт телеметрию и события")
+Rel(incidentDetection, localBuffer, "Передаёт события")
+Rel(livestockCounting, localBuffer, "Передаёт данные о поголовье")
+Rel(localBuffer, localStorage, "Сохраняет данные", "Локальная БД")
+Rel(localBuffer, localS3, "Сохраняет Артефакты данных", "S3 API")
+Rel(localSynchronization, localStorage, "Читает данные и обновляет доставку", "Локальная БД")
+Rel(localSynchronization, localS3, "Читает Артефакты данных", "S3 API")
+Rel(localSynchronization, dedicatedKafka, "Публикует данные", "Kafka")
+Rel(dedicatedKafka, existingIotGateway, "Передаёт данные синхронизации", "Kafka")
+Rel(existingIotGateway, timescaleDb, "Сохраняет синхронизированные данные", "SQL")
+Rel(timescaleDb, feedInventoryForecast, "Предоставляет данные о корме")
+Rel(timescaleDb, metricsPublisher, "Предоставляет данные для метрик")
+Rel(metricConfiguration, metricsPublisher, "Передаёт конфигурацию")
+Rel(metricsPublisher, existingKafka, "Публикует метрики", "Kafka")
+Rel(dedicatedKafka, archiverService, "Передаёт холодные записи", "Kafka")
+Rel(archiverService, existingS3DataLake, "Сохраняет архивы", "S3 API")
+
+@enduml

@@ -14,8 +14,6 @@ Person(tenantOperator, "Оператор тенанта", "Контролиру�
 Person(saasProviderOperationsStaff, "Операционный персонал провайдера SaaS", "Контролирует платформу")
 Person(farmDutyEmployee, "Дежурный сотрудник фермы", "Получает уведомления и выполняет действия")
 
-System_Ext(russianPaymentSystem, "Российская платёжная система", "Платежи")
-System_Ext(tenantInformationSystems, "Информационные системы тенанта", "Интеграция через API тенанта")
 System_Ext(identityProvider, "Провайдер идентификации", "Аутентификация пользователей")
 System_Ext(farmDevices, "Устройства и камеры фермы", "Телеметрия, видео и команды")
 
@@ -64,7 +62,6 @@ Rel(tenantAdministrator, tenantProvisioning, "Запускает онборди�
 Rel(tenantOperator, tenantAPlatform, "Контролирует данные ферм Тенанта A")
 Rel(saasProviderOperationsStaff, tenantProvisioning, "Контролирует провижининг тенантов")
 Rel(farmDutyEmployee, tenantAPlatform, "Получает уведомления и выполняет действия")
-Rel(tenantInformationSystems, tenantInstanceRouter, "Передают запросы через API тенанта")
 Rel(identityProvider, tenantInstanceRouter, "Передаёт утверждения об идентичности и тенанте")
 Rel(farmDevices, tenantAPlatform, "Передают данные и получают команды")
 Rel(tenantInstanceRouter, tenantAPlatform, "Направляет запросы Тенанта A")

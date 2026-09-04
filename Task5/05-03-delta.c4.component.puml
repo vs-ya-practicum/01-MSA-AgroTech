@@ -9,6 +9,7 @@ title SaaS-платформа — биллинг, монетизация и Оп
 
 Person(tenantOperator, "Оператор тенанта", "Контролирует данные ферм")
 Person(tenantAdministrator, "Администратор тенанта", "Управляет подпиской и интеграциями")
+System_Ext(customerInformationSystems, "Информационная система клиента", "Интеграция через API Центральной платформы")
 
 System_Ext(russianPaymentSystem, "Российская платёжная система", "Обрабатывает платежи за подписки SaaS-платформы")
 
@@ -45,7 +46,14 @@ System_Boundary(centralPlatformBoundary, "Центральная платфор�
         Component(centralWebApplication, "Центральное веб-приложение фермы", "Web application", "Интерфейс Оператора")
         Component(metricConfiguration, "Настройка метрик", "Настраивает операционные метрики")
         Component(metricsPublisher, "Публикатор метрик", "Публикует Опубликованные метрики")
+        Component(metricsAPI, "API метрик", "Предоставляет доступ Опубликованным метрикам")
+        ContainerDb(metricsDB, "Хранилище метрик")
     }
+    note bottom of centralWebApplication
+        Must add a component Metrics Management
+        that communicated with the web app
+        manages all metric operations
+    end note
 }
 
 note bottom of billingMonetizationContext
@@ -56,6 +64,8 @@ note bottom of billingMonetizationContext
     на диаграмме 05-02a-isolation-separate-database.
 end note
 
+Rel_Back(metricsDB, metricConfiguration, "Чтение/Запись")
+Rel(customerInformationSystems, metricsAPI, "Использует", "HTTPS")
 Rel(tenantOperator, centralWebApplication, "Использует", "HTTPS")
 Rel(tenantAdministrator, selfServicePanel, "Управляет подпиской и интеграциями")
 Rel(selfServicePanel, subscriptionLifecycle, "Управляет подпиской")

@@ -133,7 +133,7 @@
 
 ## 7. Интеграция с Информационной системой клиента
 
-Интеграция Информационной системы клиента с Центральной платформой (тенанта) выполняется через REST API Опубликованных метрик (см. диаграммы выше). API-контракт описан в формате OpenAPI v3.1.0 в файле [published-metrics.oas.json](./api-contract/published-metrics.oas.json).
+Интеграция Информационной системы клиента с Центральной платформой (тенанта) выполняется через REST API Опубликованных метрик (см. диаграммы выше). API-контракт описан в формате OpenAPI v3.1.0 в файле [published-metrics.oas.json](./api-contract/published-metrics.oas.json). Его можно посмотреть через [Swagger Editor](https://editor.swagger.io/)
 
 Он предоставляет следующие эндпойнты:
 
@@ -142,4 +142,6 @@
 - `GET /v1/published-metrics/catalog` — получить каталог доступных Опубликованных метрик;
 - `GET /v1/published-metrics/availability` — получить доступность Опубликованных метрик.
 
-Документация для интеграции предоставляется в виде Developer Portal на базе Stoplight Elements. Портал отображает OpenAPI-контракт API Опубликованных метрик (./published-metrics-contract/openapi.json) и содержит интерактивное описание доступных эндпоинтов, схем запросов и ответов.
+Документация для интеграции предоставляется в виде Developer Portal на базе [Astro](https://docs.astro.build/en/getting-started/). Портал отображает OpenAPI-контракт API Опубликованных метрик через open-source версию Stoplight(https://docs.stoplight.io/) и его view-компонент [Stoplight Elements](https://docs.stoplight.io/docs/elements/d6a8ba3f3c186-stoplight-elements) и содержит интерактивное описание доступных эндпоинтов, схем запросов и ответов.
+
+Developer Portal спроектирован на диаграмме компонентов "SaaS-платформа — биллинг, монетизация и Опубликованные метрики — Component" приведенной выше.

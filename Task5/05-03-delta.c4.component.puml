@@ -46,6 +46,7 @@ System_Boundary(centralPlatformBoundary, "Центральная платфор�
         Component(centralWebApplication, "Центральное веб-приложение фермы", "Web application", "Интерфейс Оператора")
         Component(metricConfiguration, "Настройка метрик", "Настраивает операционные метрики")
         Component(metricsPublisher, "Сервис Опубликованных метрик", "REST API", "Предоставляет доступ к Опубликованным метрикам")
+        Component(developerPortal, "Developer Portal", "Stoplight Elements", "Отображает документацию API Опубликованных метрик")
         ContainerDb(centralPlatformDatabase, "База данных Центральной платформы", "Database", "Хранит метрики и настройки метрик")
     }
 }
@@ -59,6 +60,7 @@ note bottom of billingMonetizationContext
 end note
 
 Rel(customerInformationSystems, metricsPublisher, "Получает Опубликованные метрики", "HTTPS")
+Rel(customerInformationSystems, developerPortal, "Использует документацию API", "HTTPS")
 Rel(tenantOperator, centralWebApplication, "Использует", "HTTPS")
 Rel(tenantAdministrator, selfServicePanel, "Управляет подпиской и интеграциями")
 Rel(selfServicePanel, subscriptionLifecycle, "Управляет подпиской")

@@ -4,7 +4,7 @@
 **Участники:** Владелец продукта; архитектор решения  
 **Дата:** 2026-09-01
 
-**Универсальный язык:** [ubiquitous-language.ru.md](../ubiquitous-language.ru.md)
+**Универсальный язык:** [ubiquitous-language-mvp.ru.md](../ubiquitous-language-mvp.ru.md)
 
 ---
 

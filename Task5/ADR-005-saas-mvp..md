@@ -14,7 +14,7 @@
 
 **Статус:** ⚠️ На рассмотрении  
 **Участники:** Владелец продукта; архитектор решения  
-**Дата:** 2026-09-03
+**Дата:** 2026-09-04
 
 ---
 
@@ -27,7 +27,7 @@
 <details>
 <summary>SaaS-платформа — To-Be — System Context</summary>
 
-![SaaS-платформа — To-Be — System Context](svg/05-01-saas-to-be.c4.context.svg)
+![SaaS-платформа — To-Be — System Context](.svg/05-01-saas-to-be.c4.context.svg)
 
 </details>
 
@@ -83,7 +83,7 @@
 <details>
 <summary>SaaS-платформа — изоляция на уровне отдельных БД — Container</summary>
 
-![SaaS-платформа — изоляция на уровне отдельных БД — Container](svg/05-02a-isolation-separate-database.c4.container.svg)
+![SaaS-платформа — изоляция на уровне отдельных БД — Container](.svg/05-02a-isolation-separate-database.c4.container.svg)
 
 </details>
 
@@ -95,7 +95,7 @@
 <details>
 <summary>SaaS-платформа — изоляция на уровне отдельных инстансов — Container</summary>
 
-![SaaS-платформа — изоляция на уровне отдельных инстансов — Container](svg/05-02b-isolation-separate-instances.c4.container.svg)
+![SaaS-платформа — изоляция на уровне отдельных инстансов — Container](.svg/05-02b-isolation-separate-instances.c4.container.svg)
 
 </details>
 
@@ -109,7 +109,7 @@
 <details>
 <summary>SaaS-платформа — биллинг, монетизация и Опубликованные метрики — Component</summary>
 
-![SaaS-платформа — биллинг, монетизация и Опубликованные метрики — Component](svg/05-03-billing-monetization.c4.component.svg)
+![SaaS-платформа — биллинг, монетизация и Опубликованные метрики — Component](.svg/05-03-billing-monetization.c4.component.svg)
 
 </details>
 

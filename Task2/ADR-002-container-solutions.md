@@ -74,7 +74,7 @@
 <details>
 <summary>Диаграмма: MVP-система свиноферм — Основной вариант — Container</summary>
 
-![MVP-система свиноферм — Основной вариант — Container](svg/02-01-primary.c4.container.svg)
+![MVP-система свиноферм — Основной вариант — Container](.svg/02-01-primary.c4.container.svg)
 
 </details>
 
@@ -87,7 +87,7 @@
 <details>
 <summary>Диаграмма: Карта ограниченных контекстов DDD</summary>
 
-![Карта ограниченных контекстов DDD](svg/ddd-context-map.ru.svg)
+![Карта ограниченных контекстов DDD](.svg/ddd-context-map.ru.svg)
 
 </details>
 
@@ -150,7 +150,7 @@
 <details>
 <summary>Диаграмма: MVP-система свиноферм — Альтернативный вариант — Container</summary>
 
-![MVP-система свиноферм — Альтернативный вариант — Container](svg/02-02-alternative.c4.container.svg)
+![MVP-система свиноферм — Альтернативный вариант — Container](.svg/02-02-alternative.c4.container.svg)
 
 </details>
 

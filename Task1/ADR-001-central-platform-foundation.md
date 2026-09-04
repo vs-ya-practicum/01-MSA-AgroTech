@@ -53,7 +53,7 @@
 <details>
 <summary>Диаграмма: MVP-система свиноферм — Основной вариант — System Context</summary>
 
-![MVP-система свиноферм — Основной вариант — System Context](./svg/01-01-primary.c4.context.svg)
+![MVP-система свиноферм — Основной вариант — System Context](./.svg/01-01-primary.c4.context.svg)
 
 </details>
 
@@ -102,7 +102,7 @@
 <details>
 <summary>Диаграмма: MVP-система свиноферм — Альтернативный вариант — System Context</summary>
 
-![MVP-система свиноферм — Альтернативный вариант — System Context](./svg/01-02-alternative.c4.context.svg)
+![MVP-система свиноферм — Альтернативный вариант — System Context](./.svg/01-02-alternative.c4.context.svg)
 
 </details>
 
